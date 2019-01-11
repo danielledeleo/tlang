@@ -1,11 +1,11 @@
 grammar Turing;
 
 /* primary rules */
-expression
-	:	
+program
+	: typeDeclaration
+	| variableDeclaration
 	;
 
-fragment
 typeSpec
 	:	INT
 	|	REAL
@@ -20,15 +20,13 @@ typeSpec
 	|	STRING L_PAREN integerLiteral R_PAREN
 	;
 
-fragment
 indexType
 	:	integerLiteral RANGE integerLiteral
 	;
 
-fragment
 indexTypeList
 	:	indexType
-	|	indexTypeList ',' indexType
+	|	indexTypeList COMMA indexType
 	;
 	
 typeDeclaration
@@ -41,14 +39,17 @@ variableDeclaration
 	|	VAR IDENTIFIER COLON typeSpec ASSIGNMENT initializingValue
 	;
 
-fragment
+initializingValue
+	:
+	;
+
 arrayDeclaration
 	:	ARRAY indexType OF typeSpec
 	|	ARRAY indexType COMMA
-
+	;
 /* literals */
 integerLiteral
-	:	DIGIT+;
+	:	DIGIT+
 	;
 
 /* keywords */
@@ -89,12 +90,10 @@ IDENTIFIER
     :   NON_DIGIT (NON_DIGIT | DIGIT)*
     ;
 
-fragment
 NON_DIGIT
     :   [a-zA-Z_]
 	;
 
-fragment
 DIGIT
 	:	[0-9]
 	;
