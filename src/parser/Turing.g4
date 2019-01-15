@@ -289,8 +289,11 @@ stringType
 	;
 
 recordType
-	: RECORD
-	| identifierList COLON typeSpec
+	: RECORD recordField+ END RECORD
+	;
+
+recordField
+	: identifierList COLON typeSpec
 	;
 
 variableDeclaration
