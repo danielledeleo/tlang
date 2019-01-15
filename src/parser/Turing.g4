@@ -8,24 +8,76 @@ program
 
 topLevel
 	: statementOrDeclaration
-	| subprogramDeclaration
+	| classDeclaration
 	;
 
 procHeader
-	: (PROCEDURE | PROCESS) IDENTIFIER (L_PAREN paramDeclarationList R_PAREN)?
+	: (PROCEDURE | PROCESS) IDENTIFIER (L_PAREN paramDeclarationList? R_PAREN)?
 	;
 
 funcHeader
-	: FUNCTION IDENTIFIER (L_PAREN paramDeclarationList R_PAREN)? (IDENTIFIER)? COLON typeSpec
+	: FUNCTION IDENTIFIER (L_PAREN paramDeclarationList? R_PAREN)? (IDENTIFIER)? COLON typeSpec
+	;
+
+subprogramHeader
+	: subprogramPrefix? (funcHeader | procHeader)
 	;
 
 subprogramDeclaration
 	: subprogramHeader procBody END IDENTIFIER
 	;
 
-subprogramHeader
-	: funcHeader
-	| procHeader
+subprogramPrefix
+	: DEFERRED
+	| BODY
+	| FORWARD
+	;
+
+classDeclaration
+	: CLASS IDENTIFIER classBody+ END IDENTIFIER
+	;
+
+classBody
+	: exportStatement
+	| inheritStatement
+	| implementStatement
+	| statementOrDeclaration
+	;
+
+exportStatement
+	: EXPORT exportList
+	| EXPORT L_PAREN exportList R_PAREN // optional parens
+	;
+
+exportListItem
+	: howExport? IDENTIFIER
+	;
+
+exportList
+	: exportListItem
+	| exportList COMMA exportListItem
+	;
+
+inheritStatement	
+	: INHERIT idOrFileItem
+	| INHERIT L_PAREN idOrFileItem R_PAREN
+	;
+
+implementStatement
+	: IMPLEMENT BY? idOrFileItem
+	| IMPLEMENT BY? L_PAREN idOrFileItem R_PAREN
+	;
+
+idOrFileItem
+	: IDENTIFIER
+	| IDENTIFIER IN stringLiteral
+	;
+
+howExport
+	: 'var'
+	| 'unqualified'
+	| 'pervasive'
+	| 'opaque'
 	;
 
 paramDeclaration
@@ -144,6 +196,7 @@ declaration
 	: typeDeclaration
 	| variableDeclaration
 	| arrayDeclaration
+	| subprogramDeclaration
 	;
 
 statement
@@ -268,6 +321,11 @@ integerLiteral
 	: DIGIT+
 	;
 
+comment
+	: BLOCK_COMMENT
+	| LINE_COMMENT
+	;
+
 /* keywords */
 END		:	'end';
 OF		:	'of';
@@ -276,6 +334,7 @@ TYPE	:	'type';
 VAR		:	'var';
 PROCEDURE	:	'procedure' | 'proc';
 FUNCTION	:	'function' | 'fcn';
+CLASS		:	'class';
 PROCESS	:	'process';
 FOR		:	'for';
 LOOP	:	'loop';
@@ -298,6 +357,13 @@ PAUSE	:	'pause';
 QUIT	:	'quit';
 UNCHECKED	:	'unchecked';
 CHECKED	:	'checked';
+EXPORT	:	'export';
+IMPORT	:	'import';
+INHERIT	:	'inherit';
+IMPLEMENT	:	'implement';
+BY		:	'by';
+
+
 
 /* built in procedures */
 PUT		:	'put';
@@ -317,6 +383,9 @@ INTN	:	'intn';
 NATN	:	'natn';
 REALN	:	'realn';
 CHAR	:	'char';
+DEFERRED:	'deferred';
+FORWARD:	'forward';
+BODY	:	'body';
 
 /* symbols and operators */
 NOT		:	'not';
@@ -363,7 +432,6 @@ IMPLIESEQUALS	:	'=>=';
 SHREQUALS		:	'shr=';
 SHLEQUALS		:	'shl=';
 XOREQUALS		:	'xor=';
-
 /* extras */
 IDENTIFIER
     :   NON_DIGIT (NON_DIGIT | DIGIT)*
@@ -381,7 +449,15 @@ WHITESPACE
 	:	[ \t\r\n]+ 
 	-> skip;
 
-/* borrow in part from C.g4 */
+/* borrowed in part from C.g4 */
+BLOCK_COMMENT
+    :   '/*' .*? '*/'
+    ;
+
+LINE_COMMENT
+    :   '%' ~[\r\n]*
+;
+
 STRING_LITERAL
     :   '"' STRING_CHAR_SEQUENCE? '"'
     ;

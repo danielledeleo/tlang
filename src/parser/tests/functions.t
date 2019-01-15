@@ -9,4 +9,10 @@ end test
 var x : int := 12
 x += 4
 
+% comment
+
+/* multiline comment
+a couple more 
+lines */
+
 put xyz(1, 2, x)
