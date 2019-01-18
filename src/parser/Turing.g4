@@ -70,7 +70,7 @@ implementStatement
 
 idOrFileItem
 	: IDENTIFIER
-	| IDENTIFIER IN stringLiteral
+	| IDENTIFIER IN STRING_LITERAL
 	;
 
 howExport
@@ -95,7 +95,7 @@ procBody
 	;
 
 statementOrDeclaration
-	: statement
+	: statements
 	| declaration
 	;
 
@@ -137,14 +137,18 @@ prefixExpression
 multiplicativeExpression
 	: postfixExpression
 	| prefixExpression
-	| multiplicativeExpression (MULTIPLY 
-	| DIVIDE 
-	| DIV 
-	| MOD 
-	| REM 
-	| SHR 
-	| SHL) (postfixExpression | prefixExpression)
+	| multiplicativeExpression multiplicativeOperator (postfixExpression | prefixExpression)
 	;
+
+multiplicativeOperator
+    : MULTIPLY
+    | DIVIDE
+    | DIV
+    | MOD
+    | REM
+    | SHR
+    | SHL
+    ;
 
 additiveExpression
 	: multiplicativeExpression
@@ -199,10 +203,9 @@ declaration
 	| subprogramDeclaration
 	;
 
-statement
+statements
 	: expression
 	| assignmentStatement
-	// file statements
 	| putStatement
 	| EXIT
 	| beginStatement
@@ -229,7 +232,7 @@ putStatement
 	;
 
 putItem
-	: statement
+	: statements
 	;
 
 putItemList
@@ -273,10 +276,11 @@ typeSpec
 	| indexType
 	| stringType
 	| recordType
+	| IDENTIFIER
 	;
 
 indexType
-	: integerLiteral RANGE integerLiteral
+	: INTEGER_LITERAL RANGE INTEGER_LITERAL
 	;
 
 indexTypeList
@@ -285,7 +289,7 @@ indexTypeList
 	;
 
 stringType
-	: STRING (L_PAREN integerLiteral R_PAREN)?
+	: STRING (L_PAREN INTEGER_LITERAL R_PAREN)?
 	;
 
 recordType
@@ -297,8 +301,13 @@ recordField
 	;
 
 variableDeclaration
-	: VAR IDENTIFIER COLON typeSpec (ASSIGNMENT expression)?
+	: VAR variableIdentifier COLON typeSpec (ASSIGNMENT expression)?
+	| VAR variableIdentifier ASSIGNMENT expression    // inferred type
 	;
+
+variableIdentifier
+    : IDENTIFIER
+    ;
 
 arrayDeclaration
 	: ARRAY indexType OF typeSpec
@@ -312,15 +321,15 @@ identifierList
 
 /* literals */
 literal
-	: integerLiteral
-	| stringLiteral
-	;
-
-stringLiteral
 	: STRING_LITERAL
+	| INTEGER_LITERAL
 	;
 
-integerLiteral
+STRING_LITERAL
+    :   '"' STRING_CHAR_SEQUENCE? '"'
+    ;
+
+INTEGER_LITERAL
 	: DIGIT+
 	;
 
@@ -440,11 +449,11 @@ IDENTIFIER
     :   NON_DIGIT (NON_DIGIT | DIGIT)*
     ;
 
-NON_DIGIT
+fragment NON_DIGIT
     :   [a-zA-Z_]
 	;
 
-DIGIT
+fragment DIGIT
 	:	[0-9]
 	;
 	
@@ -460,10 +469,6 @@ BLOCK_COMMENT
 LINE_COMMENT
     :   '%' ~[\r\n]*
 ;
-
-STRING_LITERAL
-    :   '"' STRING_CHAR_SEQUENCE? '"'
-    ;
 
 fragment STRING_CHAR_SEQUENCE
 	:	STRING_CHAR+

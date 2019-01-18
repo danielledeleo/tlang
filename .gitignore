@@ -1,3 +1,5 @@
 src/parser/.antlr
 
 build
+
+.DS_Store
