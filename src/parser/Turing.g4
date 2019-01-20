@@ -137,7 +137,7 @@ prefixExpression
 multiplicativeExpression
 	: postfixExpression
 	| prefixExpression
-	| multiplicativeExpression multiplicativeOperator (postfixExpression | prefixExpression)
+	| multiplicativeExpression multiplicativeOperator multiplicativeExpression
 	;
 
 multiplicativeOperator
@@ -152,7 +152,13 @@ multiplicativeOperator
 
 additiveExpression
 	: multiplicativeExpression
-	| additiveExpression (PLUS | MINUS | XOR) multiplicativeExpression
+	| additiveExpression additiveOperator additiveExpression
+	;
+
+additiveOperator
+	: PLUS 
+	| MINUS 
+	| XOR
 	;
 
 comparativeExpression
@@ -264,7 +270,7 @@ typeDeclaration
 	: TYPE IDENTIFIER COLON typeSpec
 	;
 
-typeSpec
+basicType
 	: INT
 	| REAL
 	| BOOLEAN
@@ -273,10 +279,18 @@ typeSpec
 	| NATN
 	| REALN
 	| CHAR
+	;
+
+referenceType
+	: IDENTIFIER;
+
+typeSpec
+	: basicType
 	| indexType
 	| stringType
 	| recordType
-	| IDENTIFIER
+	| arrayDeclaration
+	| referenceType
 	;
 
 indexType
@@ -301,9 +315,14 @@ recordField
 	;
 
 variableDeclaration
-	: VAR variableIdentifier COLON typeSpec (ASSIGNMENT expression)?
-	| VAR variableIdentifier ASSIGNMENT expression    // inferred type
+	: VAR variableIdentifierList COLON typeSpec (ASSIGNMENT expression)?
+	| VAR variableIdentifierList ASSIGNMENT expression    // inferred type
 	;
+
+variableIdentifierList
+    : variableIdentifier
+    | variableIdentifierList COMMA variableIdentifier
+    ;
 
 variableIdentifier
     : IDENTIFIER
@@ -323,6 +342,7 @@ identifierList
 literal
 	: STRING_LITERAL
 	| INTEGER_LITERAL
+	| REAL_LITERAL
 	;
 
 STRING_LITERAL
@@ -331,6 +351,10 @@ STRING_LITERAL
 
 INTEGER_LITERAL
 	: DIGIT+
+	;
+
+REAL_LITERAL
+	: DIGIT+ '.' DIGIT+
 	;
 
 comment

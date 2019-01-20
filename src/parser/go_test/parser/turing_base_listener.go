@@ -351,6 +351,12 @@ func (s *BaseTuringListener) EnterVariableDeclaration(ctx *VariableDeclarationCo
 // ExitVariableDeclaration is called when production variableDeclaration is exited.
 func (s *BaseTuringListener) ExitVariableDeclaration(ctx *VariableDeclarationContext) {}
 
+// EnterVariableIdentifierList is called when production variableIdentifierList is entered.
+func (s *BaseTuringListener) EnterVariableIdentifierList(ctx *VariableIdentifierListContext) {}
+
+// ExitVariableIdentifierList is called when production variableIdentifierList is exited.
+func (s *BaseTuringListener) ExitVariableIdentifierList(ctx *VariableIdentifierListContext) {}
+
 // EnterVariableIdentifier is called when production variableIdentifier is entered.
 func (s *BaseTuringListener) EnterVariableIdentifier(ctx *VariableIdentifierContext) {}
 

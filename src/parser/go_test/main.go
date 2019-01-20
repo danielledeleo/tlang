@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"reflect"
 
 	"./parser"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -12,7 +16,13 @@ type turingListener struct {
 }
 
 func (l *turingListener) ExitVariableDeclaration(c *parser.VariableDeclarationContext) {
-	fmt.Println(c.VariableIdentifier().GetText(), "->", c.TypeSpec().GetText())
+	identifiers := c.VariableIdentifierList()
+
+	for _, id := range identifiers.GetChildren() {
+		fmt.Println(reflect.TypeOf(id))
+	}
+
+	fmt.Println(identifiers, "->", c.TypeSpec().GetText())
 }
 
 func (l *turingListener) ExitMultiplicativeExpression(c *parser.MultiplicativeExpressionContext) {
@@ -22,7 +32,11 @@ func (l *turingListener) ExitMultiplicativeExpression(c *parser.MultiplicativeEx
 }
 
 func main() {
-	in := antlr.NewInputStream("var x : someRecord := 5 * (3 + 5)")
+	stdin, err  := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		log.Fatal(err)
+	}
+	in := antlr.NewInputStream(string(stdin))
 
 	lexer := parser.NewTuringLexer(in)
 

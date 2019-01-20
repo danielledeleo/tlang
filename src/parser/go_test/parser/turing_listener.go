@@ -173,6 +173,9 @@ type TuringListener interface {
 	// EnterVariableDeclaration is called when entering the variableDeclaration production.
 	EnterVariableDeclaration(c *VariableDeclarationContext)
 
+	// EnterVariableIdentifierList is called when entering the variableIdentifierList production.
+	EnterVariableIdentifierList(c *VariableIdentifierListContext)
+
 	// EnterVariableIdentifier is called when entering the variableIdentifier production.
 	EnterVariableIdentifier(c *VariableIdentifierContext)
 
@@ -352,6 +355,9 @@ type TuringListener interface {
 
 	// ExitVariableDeclaration is called when exiting the variableDeclaration production.
 	ExitVariableDeclaration(c *VariableDeclarationContext)
+
+	// ExitVariableIdentifierList is called when exiting the variableIdentifierList production.
+	ExitVariableIdentifierList(c *VariableIdentifierListContext)
 
 	// ExitVariableIdentifier is called when exiting the variableIdentifier production.
 	ExitVariableIdentifier(c *VariableIdentifierContext)
