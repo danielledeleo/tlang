@@ -105,39 +105,10 @@ primaryExpression
 	| L_PAREN expression R_PAREN
 	;
 
-argumentList
-	: expression
-	| argumentList ',' argumentList
-	;
-
-exponentialExpression
-	: primaryExpression EXP primaryExpression
-	;
-
-pointerExpression
-	: CARET primaryExpression
-	;
-
-postfixExpression
-	: primaryExpression
-	| pointerExpression
-	| exponentialExpression
-	| postfixExpression L_PAREN argumentList? R_PAREN
-	| postfixExpression DOT IDENTIFIER
-	| postfixExpression DEREFERENCE IDENTIFIER
-	;
-
-prefixExpression
-	: postfixExpression
-	| PLUS prefixExpression
-	| MINUS prefixExpression
-	| CHEAT prefixExpression
-	;
-
-multiplicativeExpression
-	: postfixExpression
-	| prefixExpression
-	| multiplicativeExpression multiplicativeOperator multiplicativeExpression
+prefixOperator
+	: PLUS 
+	| MINUS
+	| CHEAT
 	;
 
 multiplicativeOperator
@@ -150,56 +121,46 @@ multiplicativeOperator
     | SHL
     ;
 
-additiveExpression
-	: multiplicativeExpression
-	| additiveExpression additiveOperator additiveExpression
-	;
-
 additiveOperator
 	: PLUS 
 	| MINUS 
 	| XOR
 	;
 
-comparativeExpression
-	: additiveExpression
-	| comparativeExpression (LESSTHAN 
+comparativeOperator
+	: LESSTHAN 
 	| GREATERTHAN
 	| EQUAL
 	| LESSTHANEQUAL
 	| GREATERTHANEQUAL
 	| NOTEQUAL
 	| IN
-	| NOT IN) additiveExpression
+	| NOT IN
 	;
 
-notExpression
-	: comparativeExpression
-	| NOT notExpression
-	;
-
-andExpression
-	: notExpression
-	| andExpression AND notExpression
-	;
-
-orExpression
-	: andExpression
-	| orExpression OR andExpression
-	;
-
-impliesExpression
-	: orExpression
-	| impliesExpression IMPLIES orExpression
+NOT_IN
+	: NOT IN
 	;
 
 expression
-	: impliesExpression
+	: primaryExpression
+	| prefix=CARET expression
+	| expression bop=(DEREFERENCE | DOT) IDENTIFIER // something->identifier
+	| expression bop=EXP expression
+	| expression L_PAREN expressionList? R_PAREN // function call
+	| prefix=(PLUS | MINUS | CHEAT) expression
+	| expression bop=(MULTIPLY | DIVIDE | DIV | MOD | REM | SHR | SHL) expression
+	| expression bop=(PLUS | MINUS | XOR) expression
+	| expression bop=(LESSTHAN|GREATERTHAN|EQUAL|LESSTHANEQUAL|GREATERTHANEQUAL|NOTEQUAL|IN|NOT_IN) expression
+	| prefix=NOT expression
+	| expression bop=AND expression
+	| expression bop=OR expression
+	| expression bop=IMPLIES expression
+	| <assoc=right> expression bop=(ASSIGNMENT| PLUSEQUALS| MINUSEQUALS| MULTIPLYEQUALS| DIVIDEEQUALS| DIVEQUALS| SHLEQUALS| SHREQUALS) expression
 	;
 
 expressionList
-	: expression
-	| expressionList COMMA expression
+	: expression (COMMA expression)*
 	;
 
 declaration
@@ -211,7 +172,6 @@ declaration
 
 statements
 	: expression
-	| assignmentStatement
 	| putStatement
 	| EXIT
 	| beginStatement
@@ -222,15 +182,15 @@ statements
 	| forkStatement
 	;
 
-assignmentStatement
-	: postfixExpression (ASSIGNMENT
+assignmentOperator
+	: ASSIGNMENT
 	| PLUSEQUALS
 	| MINUSEQUALS
 	| MULTIPLYEQUALS
 	| DIVIDEEQUALS
 	| DIVEQUALS
 	| SHLEQUALS
-	| SHREQUALS) expression
+	| SHREQUALS
 	;
 
 putStatement
