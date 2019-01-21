@@ -13,11 +13,12 @@ using namespace std;
 
 class tlangVisitor: public TuringBaseVisitor {
 public:
-    map<string, tlangIdentifier*> variables;
+    map<string, tlang::Identifier*> variables;
+
 
     virtual antlrcpp::Any visitVariableDeclaration(TuringParser::VariableDeclarationContext *ctx) {
         auto start = ctx->getStart();
-        auto variable = new tlangIdentifier();
+        auto variable = new tlang::Identifier();
         auto idents = ctx->variableIdentifierList();
         
         // variable->identifier = handleTypeSpec(ctx->typeSpec());
@@ -41,28 +42,27 @@ public:
         return NULL;
     }
 
-    tlangType* resolveType(TuringParser::TypeSpecContext *ctx) {
+    tlang::Type* resolveType(TuringParser::TypeSpecContext *ctx) {
         if (ctx->basicType()) {
             auto t = ctx->basicType();
-            if (t->INT())             { return new tlangIntegerType(); }
-            else if (t->REAL())       { return new tlangRealType(); }
-            else if (t->BOOLEAN())    {}
-            else if (t->NAT())        {}
-            else if (t->INTN())       {}
-            else if (t->NATN())       {}
-            else if (t->REALN())      {}
-            else if (t->CHAR())       {}
-
+            if (t->INT())             { return new tlang::IntegerType(); }
+            else if (t->REAL())       { return new tlang::RealType(); }
+            else if (t->BOOLEAN())    { return new tlang::BooleanType(); }
+            else if (t->NAT())        { return new tlang::NaturalType(); }
+            else if (t->INTN())       { return new tlang::IntegerNType(); }
+            else if (t->NATN())       { return new tlang::NaturalNType(); }
+            else if (t->REALN())      { return new tlang::RealNType(); }
+            else if (t->CHAR())       { return new tlang::CharType(); }
             
         } else {
             if (ctx->arrayDeclaration()) { 
-                return new tlangArrayType(resolveType(ctx->arrayDeclaration()->typeSpec()));
+                return new tlang::ArrayType(resolveType(ctx->arrayDeclaration()->typeSpec()));
             }
             else if (ctx->classDeclaration()) { }
-            else if (ctx->stringType())       { }
+            else if (ctx->stringType())       { return new tlang::StringType(); }
             else if (ctx->recordType())       { }
 
-            // return new tlangCompositeType(composite);
+            // return new tlang::CompositeType(composite);
         }
         
         return NULL;
