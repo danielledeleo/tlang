@@ -79,48 +79,6 @@ public:
   virtual void enterPrimaryExpression(TuringParser::PrimaryExpressionContext * /*ctx*/) override { }
   virtual void exitPrimaryExpression(TuringParser::PrimaryExpressionContext * /*ctx*/) override { }
 
-  virtual void enterArgumentList(TuringParser::ArgumentListContext * /*ctx*/) override { }
-  virtual void exitArgumentList(TuringParser::ArgumentListContext * /*ctx*/) override { }
-
-  virtual void enterExponentialExpression(TuringParser::ExponentialExpressionContext * /*ctx*/) override { }
-  virtual void exitExponentialExpression(TuringParser::ExponentialExpressionContext * /*ctx*/) override { }
-
-  virtual void enterPointerExpression(TuringParser::PointerExpressionContext * /*ctx*/) override { }
-  virtual void exitPointerExpression(TuringParser::PointerExpressionContext * /*ctx*/) override { }
-
-  virtual void enterPostfixExpression(TuringParser::PostfixExpressionContext * /*ctx*/) override { }
-  virtual void exitPostfixExpression(TuringParser::PostfixExpressionContext * /*ctx*/) override { }
-
-  virtual void enterPrefixExpression(TuringParser::PrefixExpressionContext * /*ctx*/) override { }
-  virtual void exitPrefixExpression(TuringParser::PrefixExpressionContext * /*ctx*/) override { }
-
-  virtual void enterMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext * /*ctx*/) override { }
-  virtual void exitMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext * /*ctx*/) override { }
-
-  virtual void enterMultiplicativeOperator(TuringParser::MultiplicativeOperatorContext * /*ctx*/) override { }
-  virtual void exitMultiplicativeOperator(TuringParser::MultiplicativeOperatorContext * /*ctx*/) override { }
-
-  virtual void enterAdditiveExpression(TuringParser::AdditiveExpressionContext * /*ctx*/) override { }
-  virtual void exitAdditiveExpression(TuringParser::AdditiveExpressionContext * /*ctx*/) override { }
-
-  virtual void enterAdditiveOperator(TuringParser::AdditiveOperatorContext * /*ctx*/) override { }
-  virtual void exitAdditiveOperator(TuringParser::AdditiveOperatorContext * /*ctx*/) override { }
-
-  virtual void enterComparativeExpression(TuringParser::ComparativeExpressionContext * /*ctx*/) override { }
-  virtual void exitComparativeExpression(TuringParser::ComparativeExpressionContext * /*ctx*/) override { }
-
-  virtual void enterNotExpression(TuringParser::NotExpressionContext * /*ctx*/) override { }
-  virtual void exitNotExpression(TuringParser::NotExpressionContext * /*ctx*/) override { }
-
-  virtual void enterAndExpression(TuringParser::AndExpressionContext * /*ctx*/) override { }
-  virtual void exitAndExpression(TuringParser::AndExpressionContext * /*ctx*/) override { }
-
-  virtual void enterOrExpression(TuringParser::OrExpressionContext * /*ctx*/) override { }
-  virtual void exitOrExpression(TuringParser::OrExpressionContext * /*ctx*/) override { }
-
-  virtual void enterImpliesExpression(TuringParser::ImpliesExpressionContext * /*ctx*/) override { }
-  virtual void exitImpliesExpression(TuringParser::ImpliesExpressionContext * /*ctx*/) override { }
-
   virtual void enterExpression(TuringParser::ExpressionContext * /*ctx*/) override { }
   virtual void exitExpression(TuringParser::ExpressionContext * /*ctx*/) override { }
 
@@ -133,8 +91,8 @@ public:
   virtual void enterStatements(TuringParser::StatementsContext * /*ctx*/) override { }
   virtual void exitStatements(TuringParser::StatementsContext * /*ctx*/) override { }
 
-  virtual void enterAssignmentStatement(TuringParser::AssignmentStatementContext * /*ctx*/) override { }
-  virtual void exitAssignmentStatement(TuringParser::AssignmentStatementContext * /*ctx*/) override { }
+  virtual void enterAssignmentOperator(TuringParser::AssignmentOperatorContext * /*ctx*/) override { }
+  virtual void exitAssignmentOperator(TuringParser::AssignmentOperatorContext * /*ctx*/) override { }
 
   virtual void enterPutStatement(TuringParser::PutStatementContext * /*ctx*/) override { }
   virtual void exitPutStatement(TuringParser::PutStatementContext * /*ctx*/) override { }

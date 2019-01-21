@@ -9,13 +9,16 @@ LDARGS=-g
 LIBDIR=/usr/local/lib
 LIBS=$(LIBDIR)/libantlr4-runtime.a
 ANTLRGEN=BaseListener Lexer Listener Parser
-OBJS=$(addsuffix .o,$(addprefix $(OUTPUT)/Turing,$(ANTLRGEN)))
+OBJS=$(addsuffix .o,$(addprefix $(OUTPUT)/Turing,$(ANTLRGEN))) types.o
 
 all: main
 
+types.o: types.cpp
+	$(CC) $(CCARGS) types.cpp -o $(OUTPUT)/types.o 
+
 main: $(OBJS) main.cpp
-	$(CC) $(CCARGS) main.cpp  -o $(OUTPUT)/main.o 
-	$(CC) $(LDARGS) $(OUTPUT)/main.o $(OUTPUT)/TuringBaseListener.o $(OUTPUT)/TuringLexer.o $(OUTPUT)/TuringListener.o $(OUTPUT)/TuringParser.o $(LIBS) -o tlangparser
+	$(CC) $(CCARGS) main.cpp -o $(OUTPUT)/main.o 
+	$(CC) $(LDARGS) $(OUTPUT)/*.o $(LIBS) -o tlangparser
 
 $(OUTPUT)/%.o : $(GENERATED)/%.cpp
 	$(CC) $(CCARGS) $< -o $@

@@ -71,45 +71,6 @@ type TuringListener interface {
 	// EnterPrimaryExpression is called when entering the primaryExpression production.
 	EnterPrimaryExpression(c *PrimaryExpressionContext)
 
-	// EnterArgumentList is called when entering the argumentList production.
-	EnterArgumentList(c *ArgumentListContext)
-
-	// EnterExponentialExpression is called when entering the exponentialExpression production.
-	EnterExponentialExpression(c *ExponentialExpressionContext)
-
-	// EnterPointerExpression is called when entering the pointerExpression production.
-	EnterPointerExpression(c *PointerExpressionContext)
-
-	// EnterPostfixExpression is called when entering the postfixExpression production.
-	EnterPostfixExpression(c *PostfixExpressionContext)
-
-	// EnterPrefixExpression is called when entering the prefixExpression production.
-	EnterPrefixExpression(c *PrefixExpressionContext)
-
-	// EnterMultiplicativeExpression is called when entering the multiplicativeExpression production.
-	EnterMultiplicativeExpression(c *MultiplicativeExpressionContext)
-
-	// EnterMultiplicativeOperator is called when entering the multiplicativeOperator production.
-	EnterMultiplicativeOperator(c *MultiplicativeOperatorContext)
-
-	// EnterAdditiveExpression is called when entering the additiveExpression production.
-	EnterAdditiveExpression(c *AdditiveExpressionContext)
-
-	// EnterComparativeExpression is called when entering the comparativeExpression production.
-	EnterComparativeExpression(c *ComparativeExpressionContext)
-
-	// EnterNotExpression is called when entering the notExpression production.
-	EnterNotExpression(c *NotExpressionContext)
-
-	// EnterAndExpression is called when entering the andExpression production.
-	EnterAndExpression(c *AndExpressionContext)
-
-	// EnterOrExpression is called when entering the orExpression production.
-	EnterOrExpression(c *OrExpressionContext)
-
-	// EnterImpliesExpression is called when entering the impliesExpression production.
-	EnterImpliesExpression(c *ImpliesExpressionContext)
-
 	// EnterExpression is called when entering the expression production.
 	EnterExpression(c *ExpressionContext)
 
@@ -122,8 +83,8 @@ type TuringListener interface {
 	// EnterStatements is called when entering the statements production.
 	EnterStatements(c *StatementsContext)
 
-	// EnterAssignmentStatement is called when entering the assignmentStatement production.
-	EnterAssignmentStatement(c *AssignmentStatementContext)
+	// EnterAssignmentOperator is called when entering the assignmentOperator production.
+	EnterAssignmentOperator(c *AssignmentOperatorContext)
 
 	// EnterPutStatement is called when entering the putStatement production.
 	EnterPutStatement(c *PutStatementContext)
@@ -151,6 +112,12 @@ type TuringListener interface {
 
 	// EnterTypeDeclaration is called when entering the typeDeclaration production.
 	EnterTypeDeclaration(c *TypeDeclarationContext)
+
+	// EnterBasicType is called when entering the basicType production.
+	EnterBasicType(c *BasicTypeContext)
+
+	// EnterReferenceType is called when entering the referenceType production.
+	EnterReferenceType(c *ReferenceTypeContext)
 
 	// EnterTypeSpec is called when entering the typeSpec production.
 	EnterTypeSpec(c *TypeSpecContext)
@@ -254,45 +221,6 @@ type TuringListener interface {
 	// ExitPrimaryExpression is called when exiting the primaryExpression production.
 	ExitPrimaryExpression(c *PrimaryExpressionContext)
 
-	// ExitArgumentList is called when exiting the argumentList production.
-	ExitArgumentList(c *ArgumentListContext)
-
-	// ExitExponentialExpression is called when exiting the exponentialExpression production.
-	ExitExponentialExpression(c *ExponentialExpressionContext)
-
-	// ExitPointerExpression is called when exiting the pointerExpression production.
-	ExitPointerExpression(c *PointerExpressionContext)
-
-	// ExitPostfixExpression is called when exiting the postfixExpression production.
-	ExitPostfixExpression(c *PostfixExpressionContext)
-
-	// ExitPrefixExpression is called when exiting the prefixExpression production.
-	ExitPrefixExpression(c *PrefixExpressionContext)
-
-	// ExitMultiplicativeExpression is called when exiting the multiplicativeExpression production.
-	ExitMultiplicativeExpression(c *MultiplicativeExpressionContext)
-
-	// ExitMultiplicativeOperator is called when exiting the multiplicativeOperator production.
-	ExitMultiplicativeOperator(c *MultiplicativeOperatorContext)
-
-	// ExitAdditiveExpression is called when exiting the additiveExpression production.
-	ExitAdditiveExpression(c *AdditiveExpressionContext)
-
-	// ExitComparativeExpression is called when exiting the comparativeExpression production.
-	ExitComparativeExpression(c *ComparativeExpressionContext)
-
-	// ExitNotExpression is called when exiting the notExpression production.
-	ExitNotExpression(c *NotExpressionContext)
-
-	// ExitAndExpression is called when exiting the andExpression production.
-	ExitAndExpression(c *AndExpressionContext)
-
-	// ExitOrExpression is called when exiting the orExpression production.
-	ExitOrExpression(c *OrExpressionContext)
-
-	// ExitImpliesExpression is called when exiting the impliesExpression production.
-	ExitImpliesExpression(c *ImpliesExpressionContext)
-
 	// ExitExpression is called when exiting the expression production.
 	ExitExpression(c *ExpressionContext)
 
@@ -305,8 +233,8 @@ type TuringListener interface {
 	// ExitStatements is called when exiting the statements production.
 	ExitStatements(c *StatementsContext)
 
-	// ExitAssignmentStatement is called when exiting the assignmentStatement production.
-	ExitAssignmentStatement(c *AssignmentStatementContext)
+	// ExitAssignmentOperator is called when exiting the assignmentOperator production.
+	ExitAssignmentOperator(c *AssignmentOperatorContext)
 
 	// ExitPutStatement is called when exiting the putStatement production.
 	ExitPutStatement(c *PutStatementContext)
@@ -334,6 +262,12 @@ type TuringListener interface {
 
 	// ExitTypeDeclaration is called when exiting the typeDeclaration production.
 	ExitTypeDeclaration(c *TypeDeclarationContext)
+
+	// ExitBasicType is called when exiting the basicType production.
+	ExitBasicType(c *BasicTypeContext)
+
+	// ExitReferenceType is called when exiting the referenceType production.
+	ExitReferenceType(c *ReferenceTypeContext)
 
 	// ExitTypeSpec is called when exiting the typeSpec production.
 	ExitTypeSpec(c *TypeSpecContext)

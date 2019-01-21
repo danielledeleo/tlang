@@ -99,62 +99,6 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitArgumentList(TuringParser::ArgumentListContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitExponentialExpression(TuringParser::ExponentialExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitPointerExpression(TuringParser::PointerExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitPostfixExpression(TuringParser::PostfixExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitPrefixExpression(TuringParser::PrefixExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitMultiplicativeOperator(TuringParser::MultiplicativeOperatorContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitAdditiveExpression(TuringParser::AdditiveExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitAdditiveOperator(TuringParser::AdditiveOperatorContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitComparativeExpression(TuringParser::ComparativeExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitNotExpression(TuringParser::NotExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitAndExpression(TuringParser::AndExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitOrExpression(TuringParser::OrExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitImpliesExpression(TuringParser::ImpliesExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitExpression(TuringParser::ExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -171,7 +115,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAssignmentStatement(TuringParser::AssignmentStatementContext *ctx) override {
+  virtual antlrcpp::Any visitAssignmentOperator(TuringParser::AssignmentOperatorContext *ctx) override {
     return visitChildren(ctx);
   }
 

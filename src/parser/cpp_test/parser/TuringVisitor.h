@@ -61,34 +61,6 @@ public:
 
     virtual antlrcpp::Any visitPrimaryExpression(TuringParser::PrimaryExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitArgumentList(TuringParser::ArgumentListContext *context) = 0;
-
-    virtual antlrcpp::Any visitExponentialExpression(TuringParser::ExponentialExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitPointerExpression(TuringParser::PointerExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitPostfixExpression(TuringParser::PostfixExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitPrefixExpression(TuringParser::PrefixExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitMultiplicativeOperator(TuringParser::MultiplicativeOperatorContext *context) = 0;
-
-    virtual antlrcpp::Any visitAdditiveExpression(TuringParser::AdditiveExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitAdditiveOperator(TuringParser::AdditiveOperatorContext *context) = 0;
-
-    virtual antlrcpp::Any visitComparativeExpression(TuringParser::ComparativeExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitNotExpression(TuringParser::NotExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitAndExpression(TuringParser::AndExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitOrExpression(TuringParser::OrExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitImpliesExpression(TuringParser::ImpliesExpressionContext *context) = 0;
-
     virtual antlrcpp::Any visitExpression(TuringParser::ExpressionContext *context) = 0;
 
     virtual antlrcpp::Any visitExpressionList(TuringParser::ExpressionListContext *context) = 0;
@@ -97,7 +69,7 @@ public:
 
     virtual antlrcpp::Any visitStatements(TuringParser::StatementsContext *context) = 0;
 
-    virtual antlrcpp::Any visitAssignmentStatement(TuringParser::AssignmentStatementContext *context) = 0;
+    virtual antlrcpp::Any visitAssignmentOperator(TuringParser::AssignmentOperatorContext *context) = 0;
 
     virtual antlrcpp::Any visitPutStatement(TuringParser::PutStatementContext *context) = 0;
 

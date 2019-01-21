@@ -77,48 +77,6 @@ public:
   virtual void enterPrimaryExpression(TuringParser::PrimaryExpressionContext *ctx) = 0;
   virtual void exitPrimaryExpression(TuringParser::PrimaryExpressionContext *ctx) = 0;
 
-  virtual void enterArgumentList(TuringParser::ArgumentListContext *ctx) = 0;
-  virtual void exitArgumentList(TuringParser::ArgumentListContext *ctx) = 0;
-
-  virtual void enterExponentialExpression(TuringParser::ExponentialExpressionContext *ctx) = 0;
-  virtual void exitExponentialExpression(TuringParser::ExponentialExpressionContext *ctx) = 0;
-
-  virtual void enterPointerExpression(TuringParser::PointerExpressionContext *ctx) = 0;
-  virtual void exitPointerExpression(TuringParser::PointerExpressionContext *ctx) = 0;
-
-  virtual void enterPostfixExpression(TuringParser::PostfixExpressionContext *ctx) = 0;
-  virtual void exitPostfixExpression(TuringParser::PostfixExpressionContext *ctx) = 0;
-
-  virtual void enterPrefixExpression(TuringParser::PrefixExpressionContext *ctx) = 0;
-  virtual void exitPrefixExpression(TuringParser::PrefixExpressionContext *ctx) = 0;
-
-  virtual void enterMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext *ctx) = 0;
-  virtual void exitMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext *ctx) = 0;
-
-  virtual void enterMultiplicativeOperator(TuringParser::MultiplicativeOperatorContext *ctx) = 0;
-  virtual void exitMultiplicativeOperator(TuringParser::MultiplicativeOperatorContext *ctx) = 0;
-
-  virtual void enterAdditiveExpression(TuringParser::AdditiveExpressionContext *ctx) = 0;
-  virtual void exitAdditiveExpression(TuringParser::AdditiveExpressionContext *ctx) = 0;
-
-  virtual void enterAdditiveOperator(TuringParser::AdditiveOperatorContext *ctx) = 0;
-  virtual void exitAdditiveOperator(TuringParser::AdditiveOperatorContext *ctx) = 0;
-
-  virtual void enterComparativeExpression(TuringParser::ComparativeExpressionContext *ctx) = 0;
-  virtual void exitComparativeExpression(TuringParser::ComparativeExpressionContext *ctx) = 0;
-
-  virtual void enterNotExpression(TuringParser::NotExpressionContext *ctx) = 0;
-  virtual void exitNotExpression(TuringParser::NotExpressionContext *ctx) = 0;
-
-  virtual void enterAndExpression(TuringParser::AndExpressionContext *ctx) = 0;
-  virtual void exitAndExpression(TuringParser::AndExpressionContext *ctx) = 0;
-
-  virtual void enterOrExpression(TuringParser::OrExpressionContext *ctx) = 0;
-  virtual void exitOrExpression(TuringParser::OrExpressionContext *ctx) = 0;
-
-  virtual void enterImpliesExpression(TuringParser::ImpliesExpressionContext *ctx) = 0;
-  virtual void exitImpliesExpression(TuringParser::ImpliesExpressionContext *ctx) = 0;
-
   virtual void enterExpression(TuringParser::ExpressionContext *ctx) = 0;
   virtual void exitExpression(TuringParser::ExpressionContext *ctx) = 0;
 
@@ -131,8 +89,8 @@ public:
   virtual void enterStatements(TuringParser::StatementsContext *ctx) = 0;
   virtual void exitStatements(TuringParser::StatementsContext *ctx) = 0;
 
-  virtual void enterAssignmentStatement(TuringParser::AssignmentStatementContext *ctx) = 0;
-  virtual void exitAssignmentStatement(TuringParser::AssignmentStatementContext *ctx) = 0;
+  virtual void enterAssignmentOperator(TuringParser::AssignmentOperatorContext *ctx) = 0;
+  virtual void exitAssignmentOperator(TuringParser::AssignmentOperatorContext *ctx) = 0;
 
   virtual void enterPutStatement(TuringParser::PutStatementContext *ctx) = 0;
   virtual void exitPutStatement(TuringParser::PutStatementContext *ctx) = 0;

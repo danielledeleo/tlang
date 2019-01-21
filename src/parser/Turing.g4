@@ -105,39 +105,6 @@ primaryExpression
 	| L_PAREN expression R_PAREN
 	;
 
-prefixOperator
-	: PLUS 
-	| MINUS
-	| CHEAT
-	;
-
-multiplicativeOperator
-    : MULTIPLY
-    | DIVIDE
-    | DIV
-    | MOD
-    | REM
-    | SHR
-    | SHL
-    ;
-
-additiveOperator
-	: PLUS 
-	| MINUS 
-	| XOR
-	;
-
-comparativeOperator
-	: LESSTHAN 
-	| GREATERTHAN
-	| EQUAL
-	| LESSTHANEQUAL
-	| GREATERTHANEQUAL
-	| NOTEQUAL
-	| IN
-	| NOT IN
-	;
-
 NOT_IN
 	: NOT IN
 	;
@@ -168,6 +135,7 @@ declaration
 	| variableDeclaration
 	| arrayDeclaration
 	| subprogramDeclaration
+	| classDeclaration
 	;
 
 statements
@@ -250,6 +218,7 @@ typeSpec
 	| stringType
 	| recordType
 	| arrayDeclaration
+	| classDeclaration
 	| referenceType
 	;
 
@@ -280,8 +249,7 @@ variableDeclaration
 	;
 
 variableIdentifierList
-    : variableIdentifier
-    | variableIdentifierList COMMA variableIdentifier
+    : variableIdentifier (COMMA variableIdentifier)*
     ;
 
 variableIdentifier

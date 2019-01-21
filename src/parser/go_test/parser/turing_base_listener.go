@@ -147,84 +147,6 @@ func (s *BaseTuringListener) EnterPrimaryExpression(ctx *PrimaryExpressionContex
 // ExitPrimaryExpression is called when production primaryExpression is exited.
 func (s *BaseTuringListener) ExitPrimaryExpression(ctx *PrimaryExpressionContext) {}
 
-// EnterArgumentList is called when production argumentList is entered.
-func (s *BaseTuringListener) EnterArgumentList(ctx *ArgumentListContext) {}
-
-// ExitArgumentList is called when production argumentList is exited.
-func (s *BaseTuringListener) ExitArgumentList(ctx *ArgumentListContext) {}
-
-// EnterExponentialExpression is called when production exponentialExpression is entered.
-func (s *BaseTuringListener) EnterExponentialExpression(ctx *ExponentialExpressionContext) {}
-
-// ExitExponentialExpression is called when production exponentialExpression is exited.
-func (s *BaseTuringListener) ExitExponentialExpression(ctx *ExponentialExpressionContext) {}
-
-// EnterPointerExpression is called when production pointerExpression is entered.
-func (s *BaseTuringListener) EnterPointerExpression(ctx *PointerExpressionContext) {}
-
-// ExitPointerExpression is called when production pointerExpression is exited.
-func (s *BaseTuringListener) ExitPointerExpression(ctx *PointerExpressionContext) {}
-
-// EnterPostfixExpression is called when production postfixExpression is entered.
-func (s *BaseTuringListener) EnterPostfixExpression(ctx *PostfixExpressionContext) {}
-
-// ExitPostfixExpression is called when production postfixExpression is exited.
-func (s *BaseTuringListener) ExitPostfixExpression(ctx *PostfixExpressionContext) {}
-
-// EnterPrefixExpression is called when production prefixExpression is entered.
-func (s *BaseTuringListener) EnterPrefixExpression(ctx *PrefixExpressionContext) {}
-
-// ExitPrefixExpression is called when production prefixExpression is exited.
-func (s *BaseTuringListener) ExitPrefixExpression(ctx *PrefixExpressionContext) {}
-
-// EnterMultiplicativeExpression is called when production multiplicativeExpression is entered.
-func (s *BaseTuringListener) EnterMultiplicativeExpression(ctx *MultiplicativeExpressionContext) {}
-
-// ExitMultiplicativeExpression is called when production multiplicativeExpression is exited.
-func (s *BaseTuringListener) ExitMultiplicativeExpression(ctx *MultiplicativeExpressionContext) {}
-
-// EnterMultiplicativeOperator is called when production multiplicativeOperator is entered.
-func (s *BaseTuringListener) EnterMultiplicativeOperator(ctx *MultiplicativeOperatorContext) {}
-
-// ExitMultiplicativeOperator is called when production multiplicativeOperator is exited.
-func (s *BaseTuringListener) ExitMultiplicativeOperator(ctx *MultiplicativeOperatorContext) {}
-
-// EnterAdditiveExpression is called when production additiveExpression is entered.
-func (s *BaseTuringListener) EnterAdditiveExpression(ctx *AdditiveExpressionContext) {}
-
-// ExitAdditiveExpression is called when production additiveExpression is exited.
-func (s *BaseTuringListener) ExitAdditiveExpression(ctx *AdditiveExpressionContext) {}
-
-// EnterComparativeExpression is called when production comparativeExpression is entered.
-func (s *BaseTuringListener) EnterComparativeExpression(ctx *ComparativeExpressionContext) {}
-
-// ExitComparativeExpression is called when production comparativeExpression is exited.
-func (s *BaseTuringListener) ExitComparativeExpression(ctx *ComparativeExpressionContext) {}
-
-// EnterNotExpression is called when production notExpression is entered.
-func (s *BaseTuringListener) EnterNotExpression(ctx *NotExpressionContext) {}
-
-// ExitNotExpression is called when production notExpression is exited.
-func (s *BaseTuringListener) ExitNotExpression(ctx *NotExpressionContext) {}
-
-// EnterAndExpression is called when production andExpression is entered.
-func (s *BaseTuringListener) EnterAndExpression(ctx *AndExpressionContext) {}
-
-// ExitAndExpression is called when production andExpression is exited.
-func (s *BaseTuringListener) ExitAndExpression(ctx *AndExpressionContext) {}
-
-// EnterOrExpression is called when production orExpression is entered.
-func (s *BaseTuringListener) EnterOrExpression(ctx *OrExpressionContext) {}
-
-// ExitOrExpression is called when production orExpression is exited.
-func (s *BaseTuringListener) ExitOrExpression(ctx *OrExpressionContext) {}
-
-// EnterImpliesExpression is called when production impliesExpression is entered.
-func (s *BaseTuringListener) EnterImpliesExpression(ctx *ImpliesExpressionContext) {}
-
-// ExitImpliesExpression is called when production impliesExpression is exited.
-func (s *BaseTuringListener) ExitImpliesExpression(ctx *ImpliesExpressionContext) {}
-
 // EnterExpression is called when production expression is entered.
 func (s *BaseTuringListener) EnterExpression(ctx *ExpressionContext) {}
 
@@ -249,11 +171,11 @@ func (s *BaseTuringListener) EnterStatements(ctx *StatementsContext) {}
 // ExitStatements is called when production statements is exited.
 func (s *BaseTuringListener) ExitStatements(ctx *StatementsContext) {}
 
-// EnterAssignmentStatement is called when production assignmentStatement is entered.
-func (s *BaseTuringListener) EnterAssignmentStatement(ctx *AssignmentStatementContext) {}
+// EnterAssignmentOperator is called when production assignmentOperator is entered.
+func (s *BaseTuringListener) EnterAssignmentOperator(ctx *AssignmentOperatorContext) {}
 
-// ExitAssignmentStatement is called when production assignmentStatement is exited.
-func (s *BaseTuringListener) ExitAssignmentStatement(ctx *AssignmentStatementContext) {}
+// ExitAssignmentOperator is called when production assignmentOperator is exited.
+func (s *BaseTuringListener) ExitAssignmentOperator(ctx *AssignmentOperatorContext) {}
 
 // EnterPutStatement is called when production putStatement is entered.
 func (s *BaseTuringListener) EnterPutStatement(ctx *PutStatementContext) {}
@@ -308,6 +230,18 @@ func (s *BaseTuringListener) EnterTypeDeclaration(ctx *TypeDeclarationContext) {
 
 // ExitTypeDeclaration is called when production typeDeclaration is exited.
 func (s *BaseTuringListener) ExitTypeDeclaration(ctx *TypeDeclarationContext) {}
+
+// EnterBasicType is called when production basicType is entered.
+func (s *BaseTuringListener) EnterBasicType(ctx *BasicTypeContext) {}
+
+// ExitBasicType is called when production basicType is exited.
+func (s *BaseTuringListener) ExitBasicType(ctx *BasicTypeContext) {}
+
+// EnterReferenceType is called when production referenceType is entered.
+func (s *BaseTuringListener) EnterReferenceType(ctx *ReferenceTypeContext) {}
+
+// ExitReferenceType is called when production referenceType is exited.
+func (s *BaseTuringListener) ExitReferenceType(ctx *ReferenceTypeContext) {}
 
 // EnterTypeSpec is called when production typeSpec is entered.
 func (s *BaseTuringListener) EnterTypeSpec(ctx *TypeSpecContext) {}

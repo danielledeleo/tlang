@@ -6,15 +6,10 @@
 #include "parser/TuringParser.h"
 #include "parser/TuringBaseListener.h"
 #include "parser/TuringBaseVisitor.h"
+#include "types.h"
 
 using namespace antlr4;
 using namespace std;
-
-class tlangIdentifier {
-public:
-    string type;
-    int line_no, char_no;
-};
 
 class tlangVisitor: public TuringBaseVisitor {
 public:
@@ -25,19 +20,18 @@ public:
         auto variable = new tlangIdentifier();
         auto idents = ctx->variableIdentifierList();
         
-        variable->type = handleTypeSpec(ctx->typeSpec());
+        // variable->identifier = handleTypeSpec(ctx->typeSpec());
         variable->line_no = start->getLine();
         variable->char_no = start->getCharPositionInLine();
+        variable->type = resolveType(ctx->typeSpec());
         
-        while (idents != NULL) {
-            auto name = idents->variableIdentifier()->getText();
+        for(size_t i = 0; idents->variableIdentifier(i); i++) {
+            auto name = idents->variableIdentifier(i)->getText();
             if (!variables.insert(make_pair(name, variable)).second) {
                 cerr << "(line:" << start->getLine() << ":" << start->getCharPositionInLine();
                 cerr << ") parsing error -- '" << name << "' is already defined on (line:";
                 cerr << variables[name]->line_no << ":" << variables[name]->char_no << ")" << endl;
             }
-            
-            idents = idents->variableIdentifierList();
         }
 
         if (ctx->expression()) {
@@ -47,15 +41,53 @@ public:
         return NULL;
     }
 
-    virtual antlrcpp::Any visitAdditiveExpression(TuringParser::AdditiveExpressionContext *ctx) {
-        cout << "[" << ctx->additiveExpression(0)->getText() << " " << ctx->additiveOperator()->getText();
-        cout << " " << ctx->additiveExpression(1)->getText() << "]" << endl;
+    tlangType* resolveType(TuringParser::TypeSpecContext *ctx) {
+        if (ctx->basicType()) {
+            auto t = ctx->basicType();
+            tlangPrimitive primitive;
+            if (t->INT())             { primitive = tl_int; }
+            else if (t->REAL())       { primitive = tl_real; }
+            else if (t->BOOLEAN())    { primitive = tl_boolean; }
+            else if (t->NAT())        { primitive = tl_nat; }
+            else if (t->INTN())       { primitive = tl_intn; }
+            else if (t->NATN())       { primitive = tl_natn; }
+            else if (t->REALN())      { primitive = tl_realn; }
+            else if (t->CHAR())       { primitive = tl_char; }
+
+            return new tlangPrimitiveType(primitive);
+        } else {
+            tlangComposite composite;
+            if (ctx->arrayDeclaration())      { composite = tl_array; }
+            else if (ctx->classDeclaration()) { composite = tl_class; }
+            else if (ctx->stringType())       { composite = tl_string; }
+            else if (ctx->recordType())       { composite = tl_record; }
+
+            return new tlangCompositeType(composite);
+        }
+        
         return NULL;
     }
-    
-    virtual antlrcpp::Any visitMultiplicativeExpression(TuringParser::MultiplicativeExpressionContext *ctx) {
-        cout << "[" << ctx->multiplicativeExpression(0)->getText() << " " << ctx->multiplicativeOperator()->getText();
-        cout << " " << ctx->multiplicativeExpression(1)->getText() << "]" << endl;
+
+    virtual antlrcpp::Any visitExpression(TuringParser::ExpressionContext *ctx) {
+        if (ctx->prefix != NULL) {
+            cout << "prefix: " << ctx->prefix->getText() << endl;
+            visit(ctx->expression(0));
+        } else if (ctx->bop != NULL) {
+            cout << "binop:" << ctx->bop->getText() << endl;
+            visit(ctx->expression(0));
+            visit(ctx->expression(1));
+        } else if (ctx->primaryExpression() != NULL) {
+            // wait, we might not be done
+            if (ctx->primaryExpression()->L_PAREN()) {
+                visit(ctx->primaryExpression());
+            } else {
+                cout << "we've hit the bottom: " << ctx->primaryExpression()->getText() << endl;
+            }
+        } else {
+            cout << "method call: " << ctx->expression(0)->getText() << "(";
+            cout << ctx->expressionList()->getText() << ")" << endl;
+        }
+
         return NULL;
     }
 
@@ -88,21 +120,6 @@ public:
     }
 };
 
-class tlangListener: public TuringBaseListener {
-    virtual void exitVariableDeclaration(TuringParser::VariableDeclarationContext *ctx) {
-        auto type = ctx->typeSpec();
-        auto idents = ctx->variableIdentifierList();
-        
-        while (idents != NULL) {
-            cout << idents->variableIdentifier()->getText() << " -> " << type << endl; 
-            idents = idents->variableIdentifierList();
-        }
-    }
-
-    virtual void exitTypeSpec(TuringParser::TypeSpecContext *ctx) {
-    }
-};
-
 int main(int argc, const char* argv[]) {
     string filename;
     if (argc > 1) {
@@ -119,12 +136,18 @@ int main(int argc, const char* argv[]) {
     TuringLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     TuringParser parser(&tokens);
-    tlangListener listener;
     tlangVisitor visitor;
+
 
     // parser.addParseListener(&listener);
     
     visitor.visit(parser.program());
     
+    for (auto const& x : visitor.variables) {
+        cout << x.first << " -> "
+             << x.second->type->group()
+             << endl;
+    }
+
     stream.close();
 }
