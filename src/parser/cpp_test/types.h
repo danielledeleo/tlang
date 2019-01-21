@@ -24,28 +24,35 @@ enum tlangComposite {
 class tlangType {
 public:
     virtual string group() = 0;
+    virtual string typeName() = 0;
 };
 
 class tlangPrimitiveType : public tlangType {
 public:
     virtual string group() { return "primitive"; }
-    tlangPrimitiveType(tlangPrimitive t) {
-        primitive_type = t;
-    }
-private:
-    tlangPrimitive primitive_type;
+    virtual string typeName() = 0;
 };
 
 class tlangCompositeType : public tlangType {
 public:
     virtual string group() { return "composite"; }
-    tlangCompositeType(tlangComposite t) {
-        composite_type = t;
-    }
-private:
-    tlangComposite composite_type;
+    virtual string typeName() = 0;
 };
 
+class tlangIntegerType : public tlangPrimitiveType {
+    virtual string typeName();
+};
+
+class tlangRealType : public tlangPrimitiveType {
+    virtual string typeName();
+};
+
+class tlangArrayType : public tlangCompositeType {
+public:
+    tlangArrayType(tlangType *t);
+    virtual string typeName();
+    tlangType *memberType;
+};
 
 class tlangIdentifier {
 public:

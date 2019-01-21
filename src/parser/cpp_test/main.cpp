@@ -44,25 +44,25 @@ public:
     tlangType* resolveType(TuringParser::TypeSpecContext *ctx) {
         if (ctx->basicType()) {
             auto t = ctx->basicType();
-            tlangPrimitive primitive;
-            if (t->INT())             { primitive = tl_int; }
-            else if (t->REAL())       { primitive = tl_real; }
-            else if (t->BOOLEAN())    { primitive = tl_boolean; }
-            else if (t->NAT())        { primitive = tl_nat; }
-            else if (t->INTN())       { primitive = tl_intn; }
-            else if (t->NATN())       { primitive = tl_natn; }
-            else if (t->REALN())      { primitive = tl_realn; }
-            else if (t->CHAR())       { primitive = tl_char; }
+            if (t->INT())             { return new tlangIntegerType(); }
+            else if (t->REAL())       { return new tlangRealType(); }
+            else if (t->BOOLEAN())    {}
+            else if (t->NAT())        {}
+            else if (t->INTN())       {}
+            else if (t->NATN())       {}
+            else if (t->REALN())      {}
+            else if (t->CHAR())       {}
 
-            return new tlangPrimitiveType(primitive);
+            
         } else {
-            tlangComposite composite;
-            if (ctx->arrayDeclaration())      { composite = tl_array; }
-            else if (ctx->classDeclaration()) { composite = tl_class; }
-            else if (ctx->stringType())       { composite = tl_string; }
-            else if (ctx->recordType())       { composite = tl_record; }
+            if (ctx->arrayDeclaration()) { 
+                return new tlangArrayType(resolveType(ctx->arrayDeclaration()->typeSpec()));
+            }
+            else if (ctx->classDeclaration()) { }
+            else if (ctx->stringType())       { }
+            else if (ctx->recordType())       { }
 
-            return new tlangCompositeType(composite);
+            // return new tlangCompositeType(composite);
         }
         
         return NULL;
@@ -138,15 +138,17 @@ int main(int argc, const char* argv[]) {
     TuringParser parser(&tokens);
     tlangVisitor visitor;
 
-
     // parser.addParseListener(&listener);
     
     visitor.visit(parser.program());
     
     for (auto const& x : visitor.variables) {
-        cout << x.first << " -> "
-             << x.second->type->group()
-             << endl;
+        cout << x.first << " -> ";
+
+        if (x.second->type) {
+            cout << x.second->type->typeName();
+        }
+        cout << endl;
     }
 
     stream.close();
