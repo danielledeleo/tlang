@@ -1,7 +1,3 @@
 src/parser/.antlr
-src/parser/cpp_test/output/*
-src/parser/cpp_test/tlangparser
-src/parser/go_test/go_test
-build
 
-.DS_Store
+build
