@@ -70,7 +70,7 @@ implementStatement
 
 idOrFileItem
 	: IDENTIFIER
-	| IDENTIFIER IN STRING_LITERAL
+	| IDENTIFIER IN stringLiteral
 	;
 
 howExport
@@ -95,7 +95,7 @@ procBody
 	;
 
 statementOrDeclaration
-	: statements
+	: statement
 	| declaration
 	;
 
@@ -105,29 +105,91 @@ primaryExpression
 	| L_PAREN expression R_PAREN
 	;
 
-NOT_IN
-	: NOT IN
+argumentList
+	: expression
+	| argumentList ',' argumentList
+	;
+
+exponentialExpression
+	: primaryExpression EXP primaryExpression
+	;
+
+pointerExpression
+	: CARET primaryExpression
+	;
+
+postfixExpression
+	: primaryExpression
+	| pointerExpression
+	| exponentialExpression
+	| postfixExpression L_PAREN argumentList? R_PAREN
+	| postfixExpression DOT IDENTIFIER
+	| postfixExpression DEREFERENCE IDENTIFIER
+	;
+
+prefixExpression
+	: postfixExpression
+	| PLUS prefixExpression
+	| MINUS prefixExpression
+	| CHEAT prefixExpression
+	;
+
+multiplicativeExpression
+	: postfixExpression
+	| prefixExpression
+	| multiplicativeExpression (MULTIPLY 
+	| DIVIDE 
+	| DIV 
+	| MOD 
+	| REM 
+	| SHR 
+	| SHL) (postfixExpression | prefixExpression)
+	;
+
+additiveExpression
+	: multiplicativeExpression
+	| additiveExpression (PLUS | MINUS | XOR) multiplicativeExpression
+	;
+
+comparativeExpression
+	: additiveExpression
+	| comparativeExpression (LESSTHAN 
+	| GREATERTHAN
+	| EQUAL
+	| LESSTHANEQUAL
+	| GREATERTHANEQUAL
+	| NOTEQUAL
+	| IN
+	| NOT IN) additiveExpression
+	;
+
+notExpression
+	: comparativeExpression
+	| NOT notExpression
+	;
+
+andExpression
+	: notExpression
+	| andExpression AND notExpression
+	;
+
+orExpression
+	: andExpression
+	| orExpression OR andExpression
+	;
+
+impliesExpression
+	: orExpression
+	| impliesExpression IMPLIES orExpression
 	;
 
 expression
-	: primaryExpression
-	| prefix=CARET expression
-	| expression bop=(DEREFERENCE | DOT) IDENTIFIER // something->identifier
-	| expression bop=EXP expression
-	| expression L_PAREN expressionList? R_PAREN // function call
-	| prefix=(PLUS | MINUS | CHEAT) expression
-	| expression bop=(MULTIPLY | DIVIDE | DIV | MOD | REM | SHR | SHL) expression
-	| expression bop=(PLUS | MINUS | XOR) expression
-	| expression bop=(LESSTHAN|GREATERTHAN|EQUAL|LESSTHANEQUAL|GREATERTHANEQUAL|NOTEQUAL|IN|NOT_IN) expression
-	| prefix=NOT expression
-	| expression bop=AND expression
-	| expression bop=OR expression
-	| expression bop=IMPLIES expression
-	| <assoc=right> expression bop=(ASSIGNMENT| PLUSEQUALS| MINUSEQUALS| MULTIPLYEQUALS| DIVIDEEQUALS| DIVEQUALS| SHLEQUALS| SHREQUALS) expression
+	: impliesExpression
 	;
 
 expressionList
-	: expression (COMMA expression)*
+	: expression
+	| expressionList COMMA expression
 	;
 
 declaration
@@ -135,11 +197,12 @@ declaration
 	| variableDeclaration
 	| arrayDeclaration
 	| subprogramDeclaration
-	| classDeclaration
 	;
 
-statements
+statement
 	: expression
+	| assignmentStatement
+	// file statements
 	| putStatement
 	| EXIT
 	| beginStatement
@@ -150,15 +213,15 @@ statements
 	| forkStatement
 	;
 
-assignmentOperator
-	: ASSIGNMENT
+assignmentStatement
+	: postfixExpression (ASSIGNMENT
 	| PLUSEQUALS
 	| MINUSEQUALS
 	| MULTIPLYEQUALS
 	| DIVIDEEQUALS
 	| DIVEQUALS
 	| SHLEQUALS
-	| SHREQUALS
+	| SHREQUALS) expression
 	;
 
 putStatement
@@ -166,7 +229,7 @@ putStatement
 	;
 
 putItem
-	: statements
+	: statement
 	;
 
 putItemList
@@ -198,7 +261,7 @@ typeDeclaration
 	: TYPE IDENTIFIER COLON typeSpec
 	;
 
-basicType
+typeSpec
 	: INT
 	| REAL
 	| BOOLEAN
@@ -207,23 +270,13 @@ basicType
 	| NATN
 	| REALN
 	| CHAR
-	;
-
-referenceType
-	: IDENTIFIER;
-
-typeSpec
-	: basicType
 	| indexType
 	| stringType
 	| recordType
-	| arrayDeclaration
-	| classDeclaration
-	| referenceType
 	;
 
 indexType
-	: INTEGER_LITERAL RANGE INTEGER_LITERAL
+	: integerLiteral RANGE integerLiteral
 	;
 
 indexTypeList
@@ -232,7 +285,7 @@ indexTypeList
 	;
 
 stringType
-	: STRING (L_PAREN INTEGER_LITERAL R_PAREN)?
+	: STRING (L_PAREN integerLiteral R_PAREN)?
 	;
 
 recordType
@@ -244,17 +297,8 @@ recordField
 	;
 
 variableDeclaration
-	: VAR variableIdentifierList COLON typeSpec (ASSIGNMENT expression)?
-	| VAR variableIdentifierList ASSIGNMENT expression    // inferred type
+	: VAR IDENTIFIER COLON typeSpec (ASSIGNMENT expression)?
 	;
-
-variableIdentifierList
-    : variableIdentifier (COMMA variableIdentifier)*
-    ;
-
-variableIdentifier
-    : IDENTIFIER
-    ;
 
 arrayDeclaration
 	: ARRAY indexType OF typeSpec
@@ -268,21 +312,16 @@ identifierList
 
 /* literals */
 literal
+	: integerLiteral
+	| stringLiteral
+	;
+
+stringLiteral
 	: STRING_LITERAL
-	| INTEGER_LITERAL
-	| REAL_LITERAL
 	;
 
-STRING_LITERAL
-    :   '"' STRING_CHAR_SEQUENCE? '"'
-    ;
-
-INTEGER_LITERAL
+integerLiteral
 	: DIGIT+
-	;
-
-REAL_LITERAL
-	: DIGIT+ '.' DIGIT+
 	;
 
 comment
@@ -401,11 +440,11 @@ IDENTIFIER
     :   NON_DIGIT (NON_DIGIT | DIGIT)*
     ;
 
-fragment NON_DIGIT
+NON_DIGIT
     :   [a-zA-Z_]
 	;
 
-fragment DIGIT
+DIGIT
 	:	[0-9]
 	;
 	
@@ -421,6 +460,10 @@ BLOCK_COMMENT
 LINE_COMMENT
     :   '%' ~[\r\n]*
 ;
+
+STRING_LITERAL
+    :   '"' STRING_CHAR_SEQUENCE? '"'
+    ;
 
 fragment STRING_CHAR_SEQUENCE
 	:	STRING_CHAR+
