@@ -1,4 +1,5 @@
 #include "TTypes.h"
+#include <vector>
 
 namespace tlang {
     // IntegerType implementations
@@ -38,4 +39,11 @@ namespace tlang {
     StringType::StringType() {}
     StringType::StringType(size_t _cap) { capacity = _cap; }
 
+    // RecordType implementations
+    RecordType::RecordType(std::vector<Type*> m) {
+        members = m;
+    }
+    string RecordType::typeName() {
+        return CompositeType::group() + ":" + "record" + ":[" + members.front()->typeName() + "]";
+    }
 }

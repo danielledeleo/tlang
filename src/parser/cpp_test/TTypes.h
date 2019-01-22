@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 using namespace std;
 
 namespace tlang {
@@ -93,6 +94,14 @@ namespace tlang {
     private:
         size_t capacity;
         size_t length;
+    };
+
+    class RecordType : public CompositeType {
+    public:
+        RecordType(std::vector<tlang::Type*> members);
+        virtual string typeName();
+    private:
+        std::vector<tlang::Type*> members;
     };
 
     class Identifier {
