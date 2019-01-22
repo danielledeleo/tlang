@@ -1,7 +1,25 @@
 src/parser/.antlr
-src/parser/cpp_test/output/*
-src/parser/cpp_test/tlangparser
+src/parser/antlr.stamp
+src/parser/cpp_test/parser/*
+src/parser/go_test/parser/*
+src/parser/tlangcppparser
 src/parser/go_test/go_test
 build
 
 .DS_Store
+
+# cmake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+build.ninja
+rules.ninja
+.ninja_deps
+.ninja_log

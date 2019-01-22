@@ -2,21 +2,20 @@
 #include <strstream>
 #include <string>
 #include "antlr4-runtime/antlr4-runtime.h"
-#include "parser/TuringLexer.h"
-#include "parser/TuringParser.h"
-#include "parser/TuringBaseListener.h"
-#include "parser/TuringBaseVisitor.h"
-#include "types.h"
+#include "parser/tlangLexer.h"
+#include "parser/tlangParser.h"
+#include "parser/tlangBaseListener.h"
+#include "parser/tlangBaseVisitor.h"
+#include "TTypes.h"
 
 using namespace antlr4;
 using namespace std;
 
-class tlangVisitor: public TuringBaseVisitor {
+class compilerVisitor: public tlangBaseVisitor {
 public:
     map<string, tlang::Identifier*> variables;
 
-
-    virtual antlrcpp::Any visitVariableDeclaration(TuringParser::VariableDeclarationContext *ctx) {
+    virtual antlrcpp::Any visitVariableDeclaration(tlangParser::VariableDeclarationContext *ctx) {
         auto start = ctx->getStart();
         auto variable = new tlang::Identifier();
         auto idents = ctx->variableIdentifierList();
@@ -42,7 +41,7 @@ public:
         return NULL;
     }
 
-    tlang::Type* resolveType(TuringParser::TypeSpecContext *ctx) {
+    tlang::Type* resolveType(tlangParser::TypeSpecContext *ctx) {
         if (ctx->basicType()) {
             auto t = ctx->basicType();
             if (t->INT())             { return new tlang::IntegerType(); }
@@ -68,7 +67,7 @@ public:
         return NULL;
     }
 
-    virtual antlrcpp::Any visitExpression(TuringParser::ExpressionContext *ctx) {
+    virtual antlrcpp::Any visitExpression(tlangParser::ExpressionContext *ctx) {
         if (ctx->prefix != NULL) {
             cout << "prefix: " << ctx->prefix->getText() << endl;
             visit(ctx->expression(0));
@@ -91,7 +90,7 @@ public:
         return NULL;
     }
 
-    string handleTypeSpec(TuringParser::TypeSpecContext *ctx) {
+    string handleTypeSpec(tlangParser::TypeSpecContext *ctx) {
         if (ctx->basicType()) {
             return ctx->basicType()->getText();
 
@@ -115,7 +114,7 @@ public:
         }
     }
 
-    virtual antlrcpp::Any visitTypeSpec(TuringParser::TypeSpecContext *ctx) {
+    virtual antlrcpp::Any visitTypeSpec(tlangParser::TypeSpecContext *ctx) {
         return NULL;
     }
 };
@@ -133,12 +132,10 @@ int main(int argc, const char* argv[]) {
     stream.open(filename);
 
     ANTLRInputStream input(stream);
-    TuringLexer lexer(&input);
+    tlangLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
-    TuringParser parser(&tokens);
-    tlangVisitor visitor;
-
-    // parser.addParseListener(&listener);
+    tlangParser parser(&tokens);
+    compilerVisitor visitor;
     
     visitor.visit(parser.program());
     

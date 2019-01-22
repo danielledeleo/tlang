@@ -1,4 +1,4 @@
-grammar Turing;
+grammar tlang;
 
 /* primary rules */
 program
