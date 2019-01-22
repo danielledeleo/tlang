@@ -1,7 +1,7 @@
 #include <iostream>
 #include <strstream>
 #include <string>
-#include "antlr4-runtime/antlr4-runtime.h"
+#include "antlr4-runtime.h"
 #include "parser/tlangLexer.h"
 #include "parser/tlangParser.h"
 #include "parser/tlangBaseListener.h"

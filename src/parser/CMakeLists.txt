@@ -35,5 +35,6 @@ add_executable(tlangcppparser ${CPP_PARSER_SRCS})
 add_dependencies(tlangcppparser generate_antlr)
 
 include_directories("cpp_test/parser")
+include_directories("/usr/local/Cellar/antlr4-cpp-runtime/4.7.2/include/antlr4-runtime")
 include_directories("/usr/local/include/antlr4-runtime")
 target_link_libraries (tlangcppparser "/usr/local/lib/libantlr4-runtime.a")
