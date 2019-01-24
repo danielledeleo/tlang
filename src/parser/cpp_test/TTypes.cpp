@@ -1,5 +1,8 @@
 #include "TTypes.h"
 #include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 namespace tlang {
     // IntegerType implementations
@@ -44,6 +47,109 @@ namespace tlang {
         members = m;
     }
     string RecordType::typeName() {
-        return CompositeType::group() + ":" + "record" + ":[" + members.front()->typeName() + "]";
+        std::stringstream ss;
+
+        for_each(members.begin(), members.end(), [&ss](Type *t) -> void {
+            ss << std::endl << "    " << t->typeName();
+        });
+
+        return CompositeType::group() + ":" + "record" + ":[" + ss.str() + "\n" + "]";
+    }
+
+    // Identifier implementations
+    Identifier::Identifier(string i) {
+        identifier = i;
+    }
+    string Identifier::toString() {
+        return identifier;
+    }
+
+    // Statement implementations
+    Statement::Statement() {}
+
+    // Declaration implementations
+
+    // Expression implementations
+
+    // Block implementations
+    Block::Block() {};
+    Block::Block(vector<Phrase*> p) {
+        passage = p;
+    }
+
+    // VariableDeclaration implementations
+    VariableDeclaration::VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn) {
+        identifier = i;
+        type = t;
+        lineNo = ln;
+        charNo = cn;
+    }
+
+    Identifier* VariableDeclaration::getIdentifier() {
+        return identifier;
+    }
+
+    Type* VariableDeclaration::getType() {
+        return type;
+    }
+
+    // TypeDeclaration implementations
+    TypeDeclaration::TypeDeclaration(Identifier* i, Type* t) {
+        identifier = i;
+        type = t;
+    }
+
+    Identifier* TypeDeclaration::getIdentifier() {
+        return identifier;
+    }
+
+    // FunctionDeclaration implementations
+    FunctionDeclaration::FunctionDeclaration(Identifier* i, vector<Type*> a, Type* r, FunctionBlock* b) {
+        identifier = i;
+        arguments = a;
+        returnType = r;
+        body = b;
+    }
+    Identifier* FunctionDeclaration::getIdentifier() {
+        return identifier;
+    }
+
+    // FunctionBlock implementations
+    FunctionBlock::FunctionBlock(vector<Phrase*> p) {
+        passage = p;
+        if (!checkPhrases()) {
+            throw new exception(); // todo
+        }
+    }
+    bool FunctionBlock::checkPhrases() {
+        return true; // todo
+    }
+    
+    // ClassDeclaration implementations
+    ClassDeclaration::ClassDeclaration(Identifier* i, ClassBlock* b) {
+        identifier = i;
+        body = b;
+    }
+    Identifier* ClassDeclaration::getIdentifier() {
+        return identifier;
+    }
+
+    // ClassBlock implementations
+    ClassBlock::ClassBlock(vector<Phrase*> p) {
+        passage = p;
+        if (!checkPhrases()) {
+            throw new exception(); // todo
+        }
+    }
+
+    bool ClassBlock::checkPhrases() {
+        return true; // todo
+    }
+
+    // Module implementations
+    Module::Module(string n, Block* b) {
+        name = n;
+        body = b;
     }
 }
+

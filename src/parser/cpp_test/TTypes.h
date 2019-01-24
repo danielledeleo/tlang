@@ -3,26 +3,6 @@
 using namespace std;
 
 namespace tlang {
-    enum Primitive {
-        tl_void,
-        tl_int,
-        tl_real,
-        tl_boolean,
-        tl_nat,
-        tl_intn,
-        tl_natn,
-        tl_realn,
-        tl_char
-    };
-
-    enum Composite {
-        tl_record,
-        tl_array,
-        tl_string,
-        tl_class,
-        tl_function
-    };
-
     class Type {
     public:
         virtual string group() = 0;
@@ -41,7 +21,7 @@ namespace tlang {
         virtual string typeName() = 0;
     };
 
-    // primitive types
+    // primitive subtype classes
     class IntegerType : public PrimitiveType {
         virtual string typeName();
     };
@@ -74,7 +54,7 @@ namespace tlang {
         virtual string typeName();
     };
 
-    // composite types
+    // composite subtype classes
     class ArrayType : public CompositeType {
     public:
         ArrayType(Type *t);
@@ -98,16 +78,110 @@ namespace tlang {
 
     class RecordType : public CompositeType {
     public:
-        RecordType(std::vector<tlang::Type*> members);
+        RecordType(vector<tlang::Type*> m);
         virtual string typeName();
     private:
-        std::vector<tlang::Type*> members;
+        vector<tlang::Type*> members;
     };
 
     class Identifier {
     public:
-        // string          identifier;
-        int             line_no, char_no;
-        Type       *type;
+        Identifier(string i);
+        string toString();
+    private:
+        string identifier;
+    };
+
+    class Expression {
+    };
+
+    // todo: pick a better name for this, Turing uses "statementsAndDeclarations"
+    class Phrase {
+    public:
+        size_t lineNo;
+        size_t charNo;
+    };
+
+    class Statement : public Phrase {
+    public:
+        Statement();
+    private:
+        Expression* expression; // maybe LHS/RHS?
+    };
+
+    class Declaration : public Phrase {
+    public:
+        virtual Identifier* getIdentifier() = 0;
+    };
+
+    // Block is a general container for groups of statements, expressions, and declarations. 
+    class Block {
+    public:
+        Block();
+        Block(vector<Phrase*> p);
+        vector<Phrase*> passage;
+    private:
+    };
+
+    class VariableDeclaration : public Declaration {
+    public:
+        VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn);
+        Identifier* getIdentifier();
+        Type* getType();
+    private:
+        Identifier* identifier;
+        Type*       type;
+    };
+
+    class TypeDeclaration : public Declaration {
+    public:
+        TypeDeclaration(Identifier* i, Type* t);
+        Identifier* getIdentifier();
+    private:
+        Identifier* identifier;
+        Type* type;
+    };
+
+    class FunctionBlock : public Block {
+    public:
+        FunctionBlock(vector<Phrase*> p);
+    private:
+        bool checkPhrases();
+    };
+
+    class FunctionDeclaration : public Declaration {
+    public:
+        FunctionDeclaration(Identifier* i, vector<Type*> a, Type* r, FunctionBlock* b);
+        Identifier* getIdentifier();
+    private:
+        Identifier* identifier;
+        vector<Type*> arguments;
+        Type* returnType;
+        FunctionBlock* body;
+    };
+
+    class ClassBlock : public Block {
+    public:
+        ClassBlock(vector<Phrase*> p);
+    private:
+        bool checkPhrases();
+    };
+
+    class ClassDeclaration : public Declaration {
+    public:
+        ClassDeclaration(Identifier* i, ClassBlock* b);
+        Identifier* getIdentifier();
+    private:
+        Identifier* identifier;
+        ClassBlock* body;
+    };
+
+    class Module {
+    public:
+        Module(string n, Block* b);
+    private:
+        // todo: exports
+        string name;
+        Block* body;
     };
 } // end namespace 

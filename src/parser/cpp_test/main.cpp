@@ -13,24 +13,25 @@ using namespace std;
 
 class compilerVisitor: public tlangBaseVisitor {
 public:
-    map<string, tlang::Identifier*> variables;
+    unordered_map<string, tlang::VariableDeclaration*> vars; 
 
     virtual antlrcpp::Any visitVariableDeclaration(tlangParser::VariableDeclarationContext *ctx) {
-        auto start = ctx->getStart();
-        auto variable = new tlang::Identifier();
         auto idents = ctx->variableIdentifierList();
+        auto type = resolveType(ctx->typeSpec());
         
-        // variable->identifier = handleTypeSpec(ctx->typeSpec());
-        variable->line_no = start->getLine();
-        variable->char_no = start->getCharPositionInLine();
-        variable->type = resolveType(ctx->typeSpec());
-        
-        for(size_t i = 0; idents->variableIdentifier(i); i++) {
-            auto name = idents->variableIdentifier(i)->getText();
-            if (!variables.insert(make_pair(name, variable)).second) {
-                cerr << "(line:" << start->getLine() << ":" << start->getCharPositionInLine();
+        for(size_t i = 0; idents->variableIdentifier(i) != nullptr; i++) {
+            auto ident = idents->variableIdentifier(i);
+            auto name = ident->getText();
+            auto t_ident = new tlang::Identifier(name);
+            auto lineno = ident->getStart()->getLine();
+            auto charno = ident->getStart()->getCharPositionInLine();
+            auto variable = new tlang::VariableDeclaration(t_ident, type, lineno, charno);
+
+            if (!vars.insert(make_pair(name, variable)).second) {
+                cerr << "(line:" << lineno << ":" << charno;
                 cerr << ") parsing error -- '" << name << "' is already defined on (line:";
-                cerr << variables[name]->line_no << ":" << variables[name]->char_no << ")" << endl;
+                cerr << vars[name]->lineNo << ":" << vars[name]->charNo << ")" << endl;
+                delete variable;
             }
         }
 
@@ -59,7 +60,16 @@ public:
             }
             else if (ctx->classDeclaration()) { }
             else if (ctx->stringType())       { return new tlang::StringType(); }
-            else if (ctx->recordType())       { }
+
+            // iterates through record fields, resolves each type, and constructs a RecordType object
+            else if (ctx->recordType()) {
+                vector<tlang::Type*> members;            
+                auto fields = ctx->recordType()->recordField();
+                for_each(fields.begin(), fields.end(), [this, &members](tlangParser::RecordFieldContext *ctx) -> void {
+                    members.push_back(resolveType(ctx->typeSpec()));
+                });
+                return new tlang::RecordType(members);
+            }
 
             // return new tlang::CompositeType(composite);
         }
@@ -139,11 +149,11 @@ int main(int argc, const char* argv[]) {
     
     visitor.visit(parser.program());
     
-    for (auto const& x : visitor.variables) {
+    for (auto const& x : visitor.vars) {
         cout << x.first << " -> ";
 
-        if (x.second->type) {
-            cout << x.second->type->typeName();
+        if (x.second->getType()) {
+            cout << x.second->getType()->typeName();
         }
         cout << endl;
     }
