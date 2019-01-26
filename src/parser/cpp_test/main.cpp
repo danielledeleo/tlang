@@ -8,8 +8,16 @@
 #include "parser/tlangBaseVisitor.h"
 #include "TTypes.h"
 
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Module.h"
+
 using namespace antlr4;
 using namespace std;
+
+static llvm::LLVMContext TheContext;
+static llvm::IRBuilder<> Builder(TheContext);
+static std::unique_ptr<llvm::Module> TheModule;
 
 class compilerVisitor: public tlangBaseVisitor {
 public:
@@ -29,7 +37,7 @@ public:
 
             if (!vars.insert(make_pair(name, variable)).second) {
                 cerr << "(line:" << lineno << ":" << charno;
-                cerr << ") parsing error -- '" << name << "' is already defined on (line:";
+                cerr << ") semantic error -- '" << name << "' is already defined on (line:";
                 cerr << vars[name]->lineNo << ":" << vars[name]->charNo << ")" << endl;
                 delete variable;
             }
@@ -49,9 +57,16 @@ public:
             else if (t->REAL())       { return new tlang::RealType(); }
             else if (t->BOOLEAN())    { return new tlang::BooleanType(); }
             else if (t->NAT())        { return new tlang::NaturalType(); }
-            else if (t->INTN())       { return new tlang::IntegerNType(); }
-            else if (t->NATN())       { return new tlang::NaturalNType(); }
-            else if (t->REALN())      { return new tlang::RealNType(); }
+            else if (t->INT1())       { return new tlang::Integer1Type(); }
+            else if (t->INT2())       { return new tlang::Integer2Type(); }
+            else if (t->INT4())       { return new tlang::Integer4Type(); }
+            else if (t->INT8())       { return new tlang::Integer8Type(); }
+            else if (t->NAT1())       { return new tlang::Natural1Type(); }
+            else if (t->NAT2())       { return new tlang::Natural2Type(); }
+            else if (t->NAT4())       { return new tlang::Natural4Type(); }
+            else if (t->NAT8())       { return new tlang::Natural8Type(); }
+            else if (t->REAL4())      { return new tlang::Real4Type(); }
+            else if (t->REAL8())      { return new tlang::Real8Type(); }
             else if (t->CHAR())       { return new tlang::CharType(); }
             
         } else {
@@ -154,6 +169,9 @@ int main(int argc, const char* argv[]) {
 
         if (x.second->getType()) {
             cout << x.second->getType()->typeName();
+            // if (x.second->getType()->group() == "primitive") {
+            //     cout << "<" << ((tlang::PrimitiveType*)x.second->getType())->sizeOf() * 8 << ">";
+            // }
         }
         cout << endl;
     }

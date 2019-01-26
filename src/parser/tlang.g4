@@ -203,9 +203,16 @@ basicType
 	| REAL
 	| BOOLEAN
 	| NAT
-	| INTN
-	| NATN
-	| REALN
+	| INT1
+	| INT2
+	| INT4
+	| INT8 // new 64 bit type
+	| NAT1
+	| NAT2
+	| NAT4
+	| NAT8 // new 64 bit type
+	| REAL4
+	| REAL8
 	| CHAR
 	;
 
@@ -343,9 +350,16 @@ RECORD	:	'record';
 UNION	:	'union';
 POINTER	:	'pointer';
 NAT		:	'nat';
-INTN	:	'intn';
-NATN	:	'natn';
-REALN	:	'realn';
+INT1	:	'int1';
+INT2	:	'int2';
+INT4	:	'int4';
+INT8	:	'int8'; // new 64 bit type
+NAT1	:	'nat1';
+NAT2	:	'nat2';
+NAT4	:	'nat4';
+NAT8	:	'nat8'; // new 64 bit type
+REAL4	:	'real4';
+REAL8	:	'real8';
 CHAR	:	'char';
 DEFERRED:	'deferred';
 FORWARD:	'forward';

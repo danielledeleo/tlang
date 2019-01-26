@@ -3,31 +3,65 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <cstdint>
+
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Module.h"
 
 namespace tlang {
     // IntegerType implementations
     string IntegerType::typeName() { return PrimitiveType::group() + ":" + "int"; }
+    size_t IntegerType::sizeOf() { return sizeof(int); }
 
     // RealType implementations
     string RealType::typeName() { return PrimitiveType::group() + ":" + "real"; }
+    size_t RealType::sizeOf() { return sizeof(float); }
 
     // BooleanType implementations
     string BooleanType::typeName() { return PrimitiveType::group() + ":" + "boolean"; }
+    size_t BooleanType::sizeOf() { return sizeof(bool); }
 
     // NaturalType implemenations
     string NaturalType::typeName() { return PrimitiveType::group() + ":" + "nat"; }
+    size_t NaturalType::sizeOf() { return sizeof(uint); }
 
-    // IntegerNType implementations
-    string IntegerNType::typeName() { return PrimitiveType::group() + ":" + "intn"; } 
+    // Integer1Type implementations
+    string Integer1Type::typeName() { return PrimitiveType::group() + ":" + "int1"; } 
+    size_t Integer1Type::sizeOf() { return sizeof(int8_t); } 
+    // Integer2Type implementations
+    string Integer2Type::typeName() { return PrimitiveType::group() + ":" + "int2"; } 
+    size_t Integer2Type::sizeOf() { return sizeof(int16_t); } 
+    // Integer4Type implementations
+    string Integer4Type::typeName() { return PrimitiveType::group() + ":" + "int4"; } 
+    size_t Integer4Type::sizeOf() { return sizeof(int32_t); } 
+    // Integer8Type implementations
+    string Integer8Type::typeName() { return PrimitiveType::group() + ":" + "int8"; } 
+    size_t Integer8Type::sizeOf() { return sizeof(int64_t); } 
 
-    // NaturalNType implementations
-    string NaturalNType::typeName() { return PrimitiveType::group() + ":" + "natn"; }
+    // Natural1Type implementations
+    string Natural1Type::typeName() { return PrimitiveType::group() + ":" + "nat1"; }
+    size_t Natural1Type::sizeOf() { return sizeof(uint8_t); }
+    // Natural2Type implementations
+    string Natural2Type::typeName() { return PrimitiveType::group() + ":" + "nat2"; }
+    size_t Natural2Type::sizeOf() { return sizeof(uint16_t); }
+    // Natural4Type implementations
+    string Natural4Type::typeName() { return PrimitiveType::group() + ":" + "nat4"; }
+    size_t Natural4Type::sizeOf() { return sizeof(uint32_t); }
+    // Natural8Type implementations
+    string Natural8Type::typeName() { return PrimitiveType::group() + ":" + "nat8"; }
+    size_t Natural8Type::sizeOf() { return sizeof(uint64_t); }
 
-    // RealNType implementations
-    string RealNType::typeName() { return PrimitiveType::group() + ":" + "realn"; }
+    // Real4Type implementations
+    string Real4Type::typeName() { return PrimitiveType::group() + ":" + "real4"; }
+    size_t Real4Type::sizeOf() { return sizeof(float); }
+    // Real8Type implementations
+    string Real8Type::typeName() { return PrimitiveType::group() + ":" + "real8"; }
+    size_t Real8Type::sizeOf() { return sizeof(double); }
 
     // CharType implementations
     string CharType::typeName() { return PrimitiveType::group() + ":" + "char"; }
+    size_t CharType::sizeOf() { return sizeof(char); }
 
     // ArrayType implementations
     string ArrayType::typeName() { 
@@ -92,6 +126,10 @@ namespace tlang {
     Type* VariableDeclaration::getType() {
         return type;
     }
+    
+    llvm::Value* VariableDeclaration::codeGen() {
+        return 0;
+    }
 
     // TypeDeclaration implementations
     TypeDeclaration::TypeDeclaration(Identifier* i, Type* t) {
@@ -101,6 +139,10 @@ namespace tlang {
 
     Identifier* TypeDeclaration::getIdentifier() {
         return identifier;
+    }
+    
+    llvm::Value* TypeDeclaration::codeGen() {
+        return 0;
     }
 
     // FunctionDeclaration implementations
@@ -113,7 +155,9 @@ namespace tlang {
     Identifier* FunctionDeclaration::getIdentifier() {
         return identifier;
     }
-
+    llvm::Value* FunctionDeclaration::codeGen() {
+        return 0;
+    }
     // FunctionBlock implementations
     FunctionBlock::FunctionBlock(vector<Phrase*> p) {
         passage = p;
@@ -132,6 +176,9 @@ namespace tlang {
     }
     Identifier* ClassDeclaration::getIdentifier() {
         return identifier;
+    }
+    llvm::Value* ClassDeclaration::codeGen() {
+        return 0;
     }
 
     // ClassBlock implementations

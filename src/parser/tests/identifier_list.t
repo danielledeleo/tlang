@@ -1,5 +1,5 @@
 var a, b, c : int
-
+var c : int8
 var someArr : array 0 .. 100 of int
 var history : string
 var name : string(64)

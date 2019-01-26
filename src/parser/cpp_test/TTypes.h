@@ -1,3 +1,7 @@
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Module.h"
+
 #include <string>
 #include <vector>
 using namespace std;
@@ -13,6 +17,7 @@ namespace tlang {
     public:
         virtual string group() { return "primitive"; }
         virtual string typeName() = 0;
+        virtual size_t sizeOf() = 0;
     };
 
     class CompositeType : public Type {
@@ -24,34 +29,70 @@ namespace tlang {
     // primitive subtype classes
     class IntegerType : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
     };
 
     class RealType : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
     };
 
     class BooleanType : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
     };
 
     class NaturalType : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
     };
 
-    class IntegerNType : public PrimitiveType {
+    class Integer1Type : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Integer2Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Integer4Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Integer8Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
     };
 
-    class NaturalNType : public PrimitiveType {
+    class Natural1Type : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Natural2Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Natural4Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Natural8Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
     };
 
-    class RealNType : public PrimitiveType {
+    class Real4Type : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
+    };
+    class Real8Type : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
     };
 
     class CharType : public PrimitiveType {
         virtual string typeName();
+        virtual size_t sizeOf();
     };
 
     // composite subtype classes
@@ -112,6 +153,7 @@ namespace tlang {
     class Declaration : public Phrase {
     public:
         virtual Identifier* getIdentifier() = 0;
+        virtual llvm::Value* codeGen() = 0;
     };
 
     // Block is a general container for groups of statements, expressions, and declarations. 
@@ -128,6 +170,7 @@ namespace tlang {
         VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn);
         Identifier* getIdentifier();
         Type* getType();
+        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         Type*       type;
@@ -137,6 +180,7 @@ namespace tlang {
     public:
         TypeDeclaration(Identifier* i, Type* t);
         Identifier* getIdentifier();
+        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         Type* type;
@@ -153,6 +197,7 @@ namespace tlang {
     public:
         FunctionDeclaration(Identifier* i, vector<Type*> a, Type* r, FunctionBlock* b);
         Identifier* getIdentifier();
+        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         vector<Type*> arguments;
@@ -171,6 +216,7 @@ namespace tlang {
     public:
         ClassDeclaration(Identifier* i, ClassBlock* b);
         Identifier* getIdentifier();
+        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         ClassBlock* body;
