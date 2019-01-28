@@ -69,13 +69,18 @@ namespace tlang {
         return CompositeType::group() + ":" + "array" + ":[" + memberType->typeName() + "]"; 
     }
     ArrayType::ArrayType(Type *t) { memberType = t; }
-
+    size_t ArrayType::sizeOf() {
+        return sizeof(capacity) + sizeof(length) + sizeof(raw_array);
+    }
     // StringType implementations
     string StringType::typeName() {
         return CompositeType::group() + ":" + "string";
     }
     StringType::StringType() {}
     StringType::StringType(size_t _cap) { capacity = _cap; }
+    size_t StringType::sizeOf() {
+        return sizeof(capacity) + sizeof(length) + sizeof(raw_array);
+    }
 
     // RecordType implementations
     RecordType::RecordType(std::vector<Type*> m) {
@@ -89,6 +94,16 @@ namespace tlang {
         });
 
         return CompositeType::group() + ":" + "record" + ":[" + ss.str() + "\n" + "]";
+    }
+
+    size_t RecordType::sizeOf() {
+        size_t sum = 0;
+
+        for (auto n : members) {
+            sum += n->sizeOf();
+        }
+
+        return sum;
     }
 
     // Identifier implementations

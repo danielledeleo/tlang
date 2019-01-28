@@ -12,6 +12,7 @@ namespace tlang {
     public:
         virtual string group() = 0;
         virtual string typeName() = 0;
+        virtual size_t sizeOf() = 0;
     };
 
     class PrimitiveType : public Type {
@@ -52,14 +53,17 @@ namespace tlang {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+    
     class Integer2Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+    
     class Integer4Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+    
     class Integer8Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
@@ -69,14 +73,17 @@ namespace tlang {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+    
     class Natural2Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+    
     class Natural4Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+
     class Natural8Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
@@ -86,6 +93,7 @@ namespace tlang {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+
     class Real8Type : public PrimitiveType {
         virtual string typeName();
         virtual size_t sizeOf();
@@ -95,17 +103,26 @@ namespace tlang {
         virtual string typeName();
         virtual size_t sizeOf();
     };
+    
+    class PointerType : public PrimitiveType {
+        virtual string typeName();
+        virtual size_t sizeOf();
+    private:
+        Type *toType;
+    };
 
     // composite subtype classes
     class ArrayType : public CompositeType {
     public:
         ArrayType(Type *t);
         virtual string typeName();
-        Type *memberType;
+        virtual size_t sizeOf();
     private:
+        Type *memberType;
         size_t capacity;
         size_t length;
         size_t offset; // offset of the zeroth index (e.g. array 1950 .. 2020 of int), offset would be 1950
+        void *raw_array;
     };
 
     class StringType : public CompositeType {
@@ -113,15 +130,18 @@ namespace tlang {
         StringType();
         StringType(size_t _cap);
         virtual string typeName();
+        virtual size_t sizeOf();
     private:
         size_t capacity;
         size_t length;
+        char *raw_array;
     };
 
     class RecordType : public CompositeType {
     public:
         RecordType(vector<tlang::Type*> m);
         virtual string typeName();
+        virtual size_t sizeOf();
     private:
         vector<tlang::Type*> members;
     };
