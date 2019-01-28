@@ -1,3 +1,4 @@
+
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
@@ -153,7 +154,6 @@ namespace tlang {
     class Declaration : public Phrase {
     public:
         virtual Identifier* getIdentifier() = 0;
-        virtual llvm::Value* codeGen() = 0;
     };
 
     // Block is a general container for groups of statements, expressions, and declarations. 
@@ -167,10 +167,10 @@ namespace tlang {
 
     class VariableDeclaration : public Declaration {
     public:
-        VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn);
+        VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn, llvm::Value* val);
         Identifier* getIdentifier();
         Type* getType();
-        llvm::Value* codeGen();
+        llvm::Value* value;
     private:
         Identifier* identifier;
         Type*       type;
@@ -180,7 +180,6 @@ namespace tlang {
     public:
         TypeDeclaration(Identifier* i, Type* t);
         Identifier* getIdentifier();
-        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         Type* type;
@@ -197,7 +196,6 @@ namespace tlang {
     public:
         FunctionDeclaration(Identifier* i, vector<Type*> a, Type* r, FunctionBlock* b);
         Identifier* getIdentifier();
-        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         vector<Type*> arguments;
@@ -216,7 +214,6 @@ namespace tlang {
     public:
         ClassDeclaration(Identifier* i, ClassBlock* b);
         Identifier* getIdentifier();
-        llvm::Value* codeGen();
     private:
         Identifier* identifier;
         ClassBlock* body;

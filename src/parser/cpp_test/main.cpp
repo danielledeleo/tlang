@@ -17,11 +17,31 @@ using namespace std;
 
 static llvm::LLVMContext TheContext;
 static llvm::IRBuilder<> Builder(TheContext);
-static std::unique_ptr<llvm::Module> TheModule;
+
+void printErr(size_t lineno, size_t charno, string err_type, string err_message) {
+    cerr << "(line:" << lineno << ":" << charno;
+    cerr << ") " << err_type << " error -- '" << err_message << endl;
+}
 
 class compilerVisitor: public tlangBaseVisitor {
 public:
-    unordered_map<string, tlang::VariableDeclaration*> vars; 
+    unique_ptr<llvm::Module> TheModule;
+    unordered_map<string, tlang::VariableDeclaration*> vars;
+
+    virtual antlrcpp::Any visitProgram(tlangParser::ProgramContext *ctx) {
+        auto ft = llvm::FunctionType::get(llvm::Type::getInt32Ty(TheContext), false);
+        auto f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, "__entry_point", TheModule.get());
+
+        llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", f);
+        Builder.SetInsertPoint(BB);
+        visitChildren(ctx);
+
+        auto l = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 100, true));
+        auto r = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 200, true));
+        Builder.CreateRet(Builder.CreateAdd(l, r, "add"));
+
+        return 0;
+    }
 
     virtual antlrcpp::Any visitVariableDeclaration(tlangParser::VariableDeclarationContext *ctx) {
         auto idents = ctx->variableIdentifierList();
@@ -33,21 +53,41 @@ public:
             auto t_ident = new tlang::Identifier(name);
             auto lineno = ident->getStart()->getLine();
             auto charno = ident->getStart()->getCharPositionInLine();
-            auto variable = new tlang::VariableDeclaration(t_ident, type, lineno, charno);
+            auto val = createValue(ctx->typeSpec(), ctx->expression());
+            auto variable = new tlang::VariableDeclaration(t_ident, type, lineno, charno, val);
 
             if (!vars.insert(make_pair(name, variable)).second) {
-                cerr << "(line:" << lineno << ":" << charno;
-                cerr << ") semantic error -- '" << name << "' is already defined on (line:";
-                cerr << vars[name]->lineNo << ":" << vars[name]->charNo << ")" << endl;
+                stringstream err_message;
+                err_message << name << "' is already defined on (line:" <<
+                    vars[name]->lineNo << ":" << vars[name]->charNo << ")";
+                
+                printErr(lineno, charno, "semantic", err_message.str());
                 delete variable;
-            }
-        }
-
-        if (ctx->expression()) {
-            visit(ctx->expression());
+                exit(1);
+            }   
         }
 
         return NULL;
+    }
+
+    llvm::Value *createValue(tlangParser::TypeSpecContext *ts_ctx, tlangParser::ExpressionContext *e_ctx) {
+        if (ts_ctx->basicType()) {
+            auto t = ts_ctx->basicType();
+            if (t->INT()) {
+                uint64_t v = 0;
+                if (e_ctx) {
+                    v = atoll(e_ctx->getText().c_str());
+                }
+                return llvm::ConstantInt::get(TheContext, llvm::APInt(32, v, true));
+            } else if (t->REAL()) {
+                double v = 0;
+                if (e_ctx) {
+                    v = atof(e_ctx->getText().c_str());
+                }
+                return llvm::ConstantFP::get(TheContext, llvm::APFloat(v));
+            }
+        }
+        return 0;
     }
 
     tlang::Type* resolveType(tlangParser::TypeSpecContext *ctx) {
@@ -93,25 +133,59 @@ public:
     }
 
     virtual antlrcpp::Any visitExpression(tlangParser::ExpressionContext *ctx) {
-        if (ctx->prefix != NULL) {
-            cout << "prefix: " << ctx->prefix->getText() << endl;
+        
+        if (ctx->prefix) {
+            // cout << "prefix: " << ctx->prefix->getText() << endl;
             visit(ctx->expression(0));
-        } else if (ctx->bop != NULL) {
-            cout << "binop:" << ctx->bop->getText() << endl;
-            visit(ctx->expression(0));
-            visit(ctx->expression(1));
-        } else if (ctx->primaryExpression() != NULL) {
+        } else if (ctx->bop) {
+            auto v = handleBinOp(ctx->bop, ctx->expression(0), ctx->expression(1));
+            return v;
+        } else if (ctx->primaryExpression()) {
             // wait, we might not be done
+            if (ctx->primaryExpression()->literal()) {
+                visitLiteral(ctx->primaryExpression()->literal());
+            }
             if (ctx->primaryExpression()->L_PAREN()) {
+                // cout << "(";
                 visit(ctx->primaryExpression());
+                // cout << ")";
             } else {
-                cout << "we've hit the bottom: " << ctx->primaryExpression()->getText() << endl;
+                // cout << ctx->primaryExpression()->getText();
             }
         } else {
-            cout << "method call: " << ctx->expression(0)->getText() << "(";
-            cout << ctx->expressionList()->getText() << ")" << endl;
+            // cout << "method call: " << ctx->expression(0)->getText() << "(";
+            // cout << ctx->expressionList()->getText() << ")" << endl;
         }
 
+        return NULL;
+    }
+
+    llvm::Value *handleBinOp(Token *bop, tlangParser::ExpressionContext *LHS, tlangParser::ExpressionContext *RHS) {        
+        auto op = bop->getType();
+        auto lhs_v = visitExpression(LHS);
+        auto rhs_v = visitExpression(RHS);
+
+        switch (op) {
+            case tlangParser::PLUS:
+                return Builder.CreateAdd(lhs_v, rhs_v, "add"); break;
+            case tlangParser::MINUS:
+                return Builder.CreateSub(lhs_v, rhs_v, "minus"); break;
+            default:
+                break;
+        }
+        return nullptr;
+    }
+
+    virtual antlrcpp::Any visitLiteral(tlangParser::LiteralContext *ctx) {
+        if (ctx->INTEGER_LITERAL()) {
+            uint64_t i = atoll(ctx->getText().c_str());
+            uint64_t* ip = (uint64_t*)malloc(sizeof(uint64_t));
+            *ip = i;
+            return ip;
+        } else if (ctx->REAL_LITERAL()) {
+            auto r = atof(ctx->getText().c_str());
+            cout << "real: " << r << endl;
+        }
         return NULL;
     }
 
@@ -121,14 +195,14 @@ public:
 
         } else if (ctx->arrayDeclaration()) {
             auto range = ctx->arrayDeclaration()->indexType();
-            std::stringstream ss;
+            stringstream ss;
             ss << "[" << range->INTEGER_LITERAL(0)->getText() << ":";
             ss << range->INTEGER_LITERAL(1)->getText() << "] of ";
             ss << handleTypeSpec(ctx->arrayDeclaration()->typeSpec());
             return ss.str();
             
         } else if (ctx->stringType()) {
-            std::stringstream ss;
+            stringstream ss;
             ss << "string";
             if (ctx->stringType()->INTEGER_LITERAL()) {
                 ss << "(" << ctx->stringType()->INTEGER_LITERAL()->getText() << ")";
@@ -153,7 +227,7 @@ int main(int argc, const char* argv[]) {
         exit(-1);
     }
 
-    std::ifstream stream;
+    ifstream stream;
     stream.open(filename);
 
     ANTLRInputStream input(stream);
@@ -161,6 +235,7 @@ int main(int argc, const char* argv[]) {
     CommonTokenStream tokens(&lexer);
     tlangParser parser(&tokens);
     compilerVisitor visitor;
+    visitor.TheModule = llvm::make_unique<llvm::Module>("tlang", TheContext);
     
     visitor.visit(parser.program());
     
@@ -169,12 +244,19 @@ int main(int argc, const char* argv[]) {
 
         if (x.second->getType()) {
             cout << x.second->getType()->typeName();
+            // if (x.second->value) {
+            if (x.second->value) 
+                cout << " | " <<x.second->value->getValueID();
+            // }
             // if (x.second->getType()->group() == "primitive") {
             //     cout << "<" << ((tlang::PrimitiveType*)x.second->getType())->sizeOf() * 8 << ">";
             // }
         }
         cout << endl;
     }
+    cout << "--------------" << endl;
+
+    visitor.TheModule->print(llvm::errs(), nullptr);
 
     stream.close();
 }

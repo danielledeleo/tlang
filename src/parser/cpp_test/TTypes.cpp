@@ -13,6 +13,7 @@ namespace tlang {
     // IntegerType implementations
     string IntegerType::typeName() { return PrimitiveType::group() + ":" + "int"; }
     size_t IntegerType::sizeOf() { return sizeof(int); }
+    
 
     // RealType implementations
     string RealType::typeName() { return PrimitiveType::group() + ":" + "real"; }
@@ -112,11 +113,12 @@ namespace tlang {
     }
 
     // VariableDeclaration implementations
-    VariableDeclaration::VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn) {
+    VariableDeclaration::VariableDeclaration(Identifier* i, Type* t, size_t ln, size_t cn, llvm::Value* val) {
         identifier = i;
         type = t;
         lineNo = ln;
         charNo = cn;
+        value = val;
     }
 
     Identifier* VariableDeclaration::getIdentifier() {
@@ -125,10 +127,6 @@ namespace tlang {
 
     Type* VariableDeclaration::getType() {
         return type;
-    }
-    
-    llvm::Value* VariableDeclaration::codeGen() {
-        return 0;
     }
 
     // TypeDeclaration implementations
@@ -139,10 +137,6 @@ namespace tlang {
 
     Identifier* TypeDeclaration::getIdentifier() {
         return identifier;
-    }
-    
-    llvm::Value* TypeDeclaration::codeGen() {
-        return 0;
     }
 
     // FunctionDeclaration implementations
@@ -155,9 +149,7 @@ namespace tlang {
     Identifier* FunctionDeclaration::getIdentifier() {
         return identifier;
     }
-    llvm::Value* FunctionDeclaration::codeGen() {
-        return 0;
-    }
+
     // FunctionBlock implementations
     FunctionBlock::FunctionBlock(vector<Phrase*> p) {
         passage = p;
@@ -176,9 +168,6 @@ namespace tlang {
     }
     Identifier* ClassDeclaration::getIdentifier() {
         return identifier;
-    }
-    llvm::Value* ClassDeclaration::codeGen() {
-        return 0;
     }
 
     // ClassBlock implementations

@@ -12,6 +12,15 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "sstream": "cpp",
+        "cstdint": "cpp",
+        "vector": "cpp",
+        "strstream": "cpp",
+        "unordered_map": "cpp",
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "string": "cpp",
+        "utility": "cpp"
     }
 }
