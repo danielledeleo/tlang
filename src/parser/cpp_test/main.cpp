@@ -34,18 +34,40 @@ public:
 
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", f);
         Builder.SetInsertPoint(BB);
-        visitChildren(ctx);
+        
+        for(size_t i = 0; ctx->topLevel(i) != nullptr; i++) {
+            auto tl = ctx->topLevel(i);
+            
+            if (tl->statementOrDeclaration()) {
+                auto decl = tl->statementOrDeclaration()->declaration();
+                auto stmt = tl->statementOrDeclaration()->statement();
+                if (decl) {
+                    if (decl->subprogramDeclaration()) {
+                    } else if (decl->variableDeclaration()) {
+                        auto vars = handleVariableDeclaration(decl->variableDeclaration());
+                    }
 
-        auto l = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 100, true));
-        auto r = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 200, true));
-        Builder.CreateRet(Builder.CreateAdd(l, r, "add"));
+                } else if (stmt) {
+                    if (stmt->expression()) {
+                        Builder.CreateRet(handleExpression(stmt->expression()));
+                    }
+                }
+            }
+        }
+        // auto l = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 100, true));
+        // auto r = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 200, true));
+        // auto ret = visit(ctx->topLevel(0)->statementOrDeclaration()->statements()->expression());
+        // cout << &ret << endl;
+        // Builder.CreateRet(ret);
 
         return 0;
     }
 
-    virtual antlrcpp::Any visitVariableDeclaration(tlangParser::VariableDeclarationContext *ctx) {
+
+    vector<tlang::VariableDeclaration*>* handleVariableDeclaration(tlangParser::VariableDeclarationContext *ctx) {
         auto idents = ctx->variableIdentifierList();
         auto type = resolveType(ctx->typeSpec());
+        vector<tlang::VariableDeclaration*> *variables;
         
         for(size_t i = 0; idents->variableIdentifier(i) != nullptr; i++) {
             auto ident = idents->variableIdentifier(i);
@@ -55,6 +77,7 @@ public:
             auto charno = ident->getStart()->getCharPositionInLine();
             auto val = createValue(ctx->typeSpec(), ctx->expression());
             auto variable = new tlang::VariableDeclaration(t_ident, type, lineno, charno, val);
+            variables->push_back(variable);
 
             if (!vars.insert(make_pair(name, variable)).second) {
                 stringstream err_message;
@@ -67,7 +90,7 @@ public:
             }   
         }
 
-        return NULL;
+        return variables;
     }
 
     llvm::Value *createValue(tlangParser::TypeSpecContext *ts_ctx, tlangParser::ExpressionContext *e_ctx) {
@@ -132,7 +155,7 @@ public:
         return NULL;
     }
 
-    virtual antlrcpp::Any visitExpression(tlangParser::ExpressionContext *ctx) {
+    llvm::Value* handleExpression(tlangParser::ExpressionContext *ctx) {
         
         if (ctx->prefix) {
             // cout << "prefix: " << ctx->prefix->getText() << endl;
@@ -143,12 +166,9 @@ public:
         } else if (ctx->primaryExpression()) {
             // wait, we might not be done
             if (ctx->primaryExpression()->literal()) {
-                visitLiteral(ctx->primaryExpression()->literal());
-            }
-            if (ctx->primaryExpression()->L_PAREN()) {
-                // cout << "(";
-                visit(ctx->primaryExpression());
-                // cout << ")";
+                return visitLiteral(ctx->primaryExpression()->literal());
+            } else if (ctx->primaryExpression()->L_PAREN()) {
+                return handleExpression(ctx->primaryExpression()->expression());
             } else {
                 // cout << ctx->primaryExpression()->getText();
             }
@@ -162,8 +182,8 @@ public:
 
     llvm::Value *handleBinOp(Token *bop, tlangParser::ExpressionContext *LHS, tlangParser::ExpressionContext *RHS) {        
         auto op = bop->getType();
-        auto lhs_v = visitExpression(LHS);
-        auto rhs_v = visitExpression(RHS);
+        auto lhs_v = handleExpression(LHS);
+        auto rhs_v = handleExpression(RHS);
 
         switch (op) {
             case tlangParser::PLUS:
@@ -183,8 +203,10 @@ public:
             *ip = i;
             return ip;
         } else if (ctx->REAL_LITERAL()) {
-            auto r = atof(ctx->getText().c_str());
-            cout << "real: " << r << endl;
+            double r = atof(ctx->getText().c_str());
+            double* rp = (double*)malloc(sizeof(double));
+            *rp = r;
+            return rp;
         }
         return NULL;
     }

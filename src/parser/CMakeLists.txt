@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.0)
 project(tlangparsers VERSION 0.0.1)
 
 set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 set (LLVM_DIR /usr/local/Cellar/llvm/7.0.1/lib/cmake/llvm)
 

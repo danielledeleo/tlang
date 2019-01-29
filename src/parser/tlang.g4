@@ -95,7 +95,7 @@ procBody
 	;
 
 statementOrDeclaration
-	: statements
+	: statement
 	| declaration
 	;
 
@@ -138,7 +138,7 @@ declaration
 	| classDeclaration
 	;
 
-statements
+statement
 	: expression
 	| putStatement
 	| EXIT
@@ -166,7 +166,7 @@ putStatement
 	;
 
 putItem
-	: statements
+	: statement
 	;
 
 putItemList
