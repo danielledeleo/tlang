@@ -8,9 +8,11 @@
 #include "parser/tlangBaseVisitor.h"
 #include "TTypes.h"
 
+
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/Verifier.h"
 
 using namespace antlr4;
 using namespace std;
@@ -50,6 +52,7 @@ public:
                 } else if (stmt) {
                     if (stmt->expression()) {
                         Builder.CreateRet(handleExpression(stmt->expression()));
+                        llvm::verifyFunction(*f);
                     }
                 }
             }
@@ -281,4 +284,5 @@ int main(int argc, const char* argv[]) {
     visitor.TheModule->print(llvm::errs(), nullptr);
 
     stream.close();
+    return 0;
 }
