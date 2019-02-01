@@ -4,10 +4,10 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/Cellar/antlr4-cpp-runtime/4.7.2/include/antlr4-runtime",
+                "/usr/local/opt/antlr4-cpp-runtime/include/antlr4-runtime",
                 "/usr/local/include/boost",
                 "/usr/local/include/antlr4-runtime",
-                "/usr/local/Cellar/llvm/7.0.1/include"
+                "/usr/local/opt/llvm/include"
             ],
             "defines": [],
             "macFrameworkPath": [

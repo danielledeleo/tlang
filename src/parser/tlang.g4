@@ -9,6 +9,7 @@ program
 topLevel
 	: statementOrDeclaration
 	| classDeclaration
+	| comment
 	;
 
 procHeader
@@ -123,7 +124,7 @@ expression
 	| expression bop=AND expression
 	| expression bop=OR expression
 	| expression bop=IMPLIES expression
-	| <assoc=right> expression bop=(ASSIGNMENT| PLUSEQUALS| MINUSEQUALS| MULTIPLYEQUALS| DIVIDEEQUALS| DIVEQUALS| SHLEQUALS| SHREQUALS) expression
+	| expression bop=(ASSIGNMENT| PLUSEQUALS| MINUSEQUALS| MULTIPLYEQUALS| DIVIDEEQUALS| DIVEQUALS| SHLEQUALS| SHREQUALS) expression
 	;
 
 expressionList
@@ -276,16 +277,37 @@ identifierList
 /* literals */
 literal
 	: STRING_LITERAL
-	| INTEGER_LITERAL
 	| REAL_LITERAL
+	| INTEGER_LITERAL
 	;
+
+// integer_literal
 
 STRING_LITERAL
     :   '"' STRING_CHAR_SEQUENCE? '"'
     ;
 
 INTEGER_LITERAL
+	: DECIMAL_LITERAL
+	| HEX_LITERAL
+	| OCTAL_LITERAL
+	| BINARY_LITERAL
+	;
+
+fragment DECIMAL_LITERAL
 	: DIGIT+
+	;
+
+fragment HEX_LITERAL
+	: HEX_PREFIX HEX_DIGIT+
+	;
+
+fragment OCTAL_LITERAL
+	: OCTAL_PREFIX OCTAL_DIGIT+ 
+	;
+
+fragment BINARY_LITERAL
+	: BINARY_PREFIX ('0' | '1')+
 	;
 
 REAL_LITERAL
@@ -423,6 +445,26 @@ fragment DIGIT
 	:	[0-9]
 	;
 	
+fragment HEX_DIGIT
+	:	[0-9a-fA-F]
+	;
+
+fragment OCTAL_DIGIT
+	:	[0-7]
+	;
+
+fragment HEX_PREFIX
+	: '0' [xX]
+	;
+
+fragment OCTAL_PREFIX
+	: '0'
+	;
+
+fragment BINARY_PREFIX
+	: '0b'
+	;
+
 WHITESPACE	
 	:	[ \t\r\n]+ 
 	-> skip;

@@ -39,6 +39,7 @@ public:
         
         for(size_t i = 0; ctx->topLevel(i) != nullptr; i++) {
             auto tl = ctx->topLevel(i);
+            // cout << " -- " << i << " -- " << endl;
             
             if (tl->statementOrDeclaration()) {
                 auto decl = tl->statementOrDeclaration()->declaration();
@@ -70,7 +71,7 @@ public:
     vector<tlang::VariableDeclaration*>* handleVariableDeclaration(tlangParser::VariableDeclarationContext *ctx) {
         auto idents = ctx->variableIdentifierList();
         auto type = resolveType(ctx->typeSpec());
-        vector<tlang::VariableDeclaration*> *variables;
+        auto variables = new vector<tlang::VariableDeclaration*>();
         
         for(size_t i = 0; idents->variableIdentifier(i) != nullptr; i++) {
             auto ident = idents->variableIdentifier(i);
@@ -89,7 +90,7 @@ public:
                 
                 printErr(lineno, charno, "semantic", err_message.str());
                 delete variable;
-                exit(1);
+                // exit(1);
             }   
         }
 
@@ -169,7 +170,7 @@ public:
         } else if (ctx->primaryExpression()) {
             // wait, we might not be done
             if (ctx->primaryExpression()->literal()) {
-                return visitLiteral(ctx->primaryExpression()->literal());
+                return handleLiteral(ctx->primaryExpression()->literal());
             } else if (ctx->primaryExpression()->L_PAREN()) {
                 return handleExpression(ctx->primaryExpression()->expression());
             } else {
@@ -199,19 +200,39 @@ public:
         return nullptr;
     }
 
-    virtual antlrcpp::Any visitLiteral(tlangParser::LiteralContext *ctx) {
-        if (ctx->INTEGER_LITERAL()) {
-            uint64_t i = atoll(ctx->getText().c_str());
-            uint64_t* ip = (uint64_t*)malloc(sizeof(uint64_t));
-            *ip = i;
-            return ip;
+    virtual llvm::Value* handleLiteral(tlangParser::LiteralContext *ctx) {
+        char *strolchar;
+        if (ctx->integer_literal()) {
+            auto l = ctx->integer_literal();
+            if (l->DECIMAL_LITERAL()) {
+                if (l->sign) {
+                    // signed integer
+                    if (l->sign->getType() == tlangParser::MINUS) {
+                        int64_t i = strtoll(l->getText().c_str(), &strolchar, 10);
+                        if (errno == ERANGE) {
+                            printErr(l->getStart()->getLine(), 
+                                l->DECIMAL_LITERAL()->getSourceInterval().a, 
+                                "semantic", "integer literal too big");
+                        }
+                        return llvm::ConstantInt::get(TheContext, llvm::APInt(64, i, true));
+                    } 
+                } else {
+                    // unsigned int
+                    uint64_t ui = strtoull(ctx->getText().c_str(), &strolchar, 10);
+                    return llvm::ConstantInt::get(TheContext, llvm::APInt(64, ui, false));
+                }
+            } else if (l->HEX_LITERAL()) {
+
+            } else if (l->OCTAL_LITERAL()) {
+
+            } else if (l->BINARY_LITERAL()) {
+                
+            }
         } else if (ctx->REAL_LITERAL()) {
             double r = atof(ctx->getText().c_str());
-            double* rp = (double*)malloc(sizeof(double));
-            *rp = r;
-            return rp;
+            return llvm::ConstantFP::get(TheContext, llvm::APFloat(r));;
         }
-        return NULL;
+        return nullptr;
     }
 
     string handleTypeSpec(tlangParser::TypeSpecContext *ctx) {
@@ -221,16 +242,16 @@ public:
         } else if (ctx->arrayDeclaration()) {
             auto range = ctx->arrayDeclaration()->indexType();
             stringstream ss;
-            ss << "[" << range->INTEGER_LITERAL(0)->getText() << ":";
-            ss << range->INTEGER_LITERAL(1)->getText() << "] of ";
+            ss << "[" << range->DECIMAL_LITERAL(0)->getText() << ":";
+            ss << range->DECIMAL_LITERAL(1)->getText() << "] of ";
             ss << handleTypeSpec(ctx->arrayDeclaration()->typeSpec());
             return ss.str();
             
         } else if (ctx->stringType()) {
             stringstream ss;
             ss << "string";
-            if (ctx->stringType()->INTEGER_LITERAL()) {
-                ss << "(" << ctx->stringType()->INTEGER_LITERAL()->getText() << ")";
+            if (ctx->stringType()->DECIMAL_LITERAL()) {
+                ss << "(" << ctx->stringType()->DECIMAL_LITERAL()->getText() << ")";
             }
             return ss.str();
         } else {
@@ -284,5 +305,4 @@ int main(int argc, const char* argv[]) {
     visitor.TheModule->print(llvm::errs(), nullptr);
 
     stream.close();
-    return 0;
 }
