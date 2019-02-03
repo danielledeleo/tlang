@@ -8,7 +8,6 @@
 #include "parser/tlangBaseVisitor.h"
 #include "TTypes.h"
 
-
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
@@ -22,7 +21,7 @@ static llvm::IRBuilder<> Builder(TheContext);
 
 void printErr(size_t lineno, size_t charno, string err_type, string err_message) {
     cerr << "(line:" << lineno << ":" << charno;
-    cerr << ") " << err_type << " error -- '" << err_message << endl;
+    cerr << ") " << err_type << " error -- " << err_message << endl;
 }
 
 class compilerVisitor: public tlangBaseVisitor {
@@ -31,7 +30,7 @@ public:
     unordered_map<string, tlang::VariableDeclaration*> vars;
 
     virtual antlrcpp::Any visitProgram(tlangParser::ProgramContext *ctx) {
-        auto ft = llvm::FunctionType::get(llvm::Type::getInt32Ty(TheContext), false);
+        auto ft = llvm::FunctionType::get(llvm::Type::getInt64Ty(TheContext), false);
         auto f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, "__entry_point", TheModule.get());
 
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", f);
@@ -200,33 +199,38 @@ public:
         return nullptr;
     }
 
-    virtual llvm::Value* handleLiteral(tlangParser::LiteralContext *ctx) {
-        char *strolchar;
+    llvm::Value* handleIntLiteral(tlangParser::Integer_literalContext *l, int base, bool is_signed) {
+        char *strtolchar;
+        uint64_t i = strtoull(l->getText().c_str(), &strtolchar, base);
+
+        if (errno == ERANGE) {
+            printErr(l->getStart()->getLine(), 
+                l->getStart()->getCharPositionInLine(), 
+                "semantic", "integer literal too big");
+        }
+        return llvm::ConstantInt::get(TheContext, llvm::APInt(64, i, is_signed)); 
+    }
+
+    llvm::Value* handleLiteral(tlangParser::LiteralContext *ctx) {
+        char *strtolchar;
         if (ctx->integer_literal()) {
             auto l = ctx->integer_literal();
             if (l->DECIMAL_LITERAL()) {
                 if (l->sign) {
                     // signed integer
                     if (l->sign->getType() == tlangParser::MINUS) {
-                        int64_t i = strtoll(l->getText().c_str(), &strolchar, 10);
-                        if (errno == ERANGE) {
-                            printErr(l->getStart()->getLine(), 
-                                l->DECIMAL_LITERAL()->getSourceInterval().a, 
-                                "semantic", "integer literal too big");
-                        }
-                        return llvm::ConstantInt::get(TheContext, llvm::APInt(64, i, true));
+                        return handleIntLiteral(l, 10, true);
                     } 
                 } else {
-                    // unsigned int
-                    uint64_t ui = strtoull(ctx->getText().c_str(), &strolchar, 10);
-                    return llvm::ConstantInt::get(TheContext, llvm::APInt(64, ui, false));
+                    // unsigned integer
+                    return handleIntLiteral(l, 10, false);
                 }
             } else if (l->HEX_LITERAL()) {
-
+                return handleIntLiteral(l, 16, false);
             } else if (l->OCTAL_LITERAL()) {
-
+                return handleIntLiteral(l, 8, false);
             } else if (l->BINARY_LITERAL()) {
-                
+                return handleIntLiteral(l, 2, false);
             }
         } else if (ctx->REAL_LITERAL()) {
             double r = atof(ctx->getText().c_str());
@@ -242,16 +246,16 @@ public:
         } else if (ctx->arrayDeclaration()) {
             auto range = ctx->arrayDeclaration()->indexType();
             stringstream ss;
-            ss << "[" << range->DECIMAL_LITERAL(0)->getText() << ":";
-            ss << range->DECIMAL_LITERAL(1)->getText() << "] of ";
+            ss << "[" << range->integer_literal(0)->getText() << ":";
+            ss << range->integer_literal(1)->getText() << "] of ";
             ss << handleTypeSpec(ctx->arrayDeclaration()->typeSpec());
             return ss.str();
             
         } else if (ctx->stringType()) {
             stringstream ss;
             ss << "string";
-            if (ctx->stringType()->DECIMAL_LITERAL()) {
-                ss << "(" << ctx->stringType()->DECIMAL_LITERAL()->getText() << ")";
+            if (ctx->stringType()->integer_literal()) {
+                ss << "(" << ctx->stringType()->integer_literal()->getText() << ")";
             }
             return ss.str();
         } else {

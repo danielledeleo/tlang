@@ -231,7 +231,7 @@ typeSpec
 	;
 
 indexType
-	: INTEGER_LITERAL RANGE INTEGER_LITERAL
+	: integer_literal RANGE integer_literal
 	;
 
 indexTypeList
@@ -240,7 +240,7 @@ indexTypeList
 	;
 
 stringType
-	: STRING (L_PAREN INTEGER_LITERAL R_PAREN)?
+	: STRING (L_PAREN integer_literal R_PAREN)?
 	;
 
 recordType
@@ -278,7 +278,7 @@ identifierList
 literal
 	: STRING_LITERAL
 	| REAL_LITERAL
-	| INTEGER_LITERAL
+	| integer_literal
 	;
 
 // integer_literal
@@ -287,27 +287,27 @@ STRING_LITERAL
     :   '"' STRING_CHAR_SEQUENCE? '"'
     ;
 
-INTEGER_LITERAL
-	: DECIMAL_LITERAL
-	| HEX_LITERAL
-	| OCTAL_LITERAL
+integer_literal
+	: OCTAL_LITERAL
+	| sign=(PLUS | MINUS)? DECIMAL_LITERAL
 	| BINARY_LITERAL
+	| HEX_LITERAL
 	;
 
-fragment DECIMAL_LITERAL
-	: DIGIT+
-	;
-
-fragment HEX_LITERAL
-	: HEX_PREFIX HEX_DIGIT+
-	;
-
-fragment OCTAL_LITERAL
+OCTAL_LITERAL
 	: OCTAL_PREFIX OCTAL_DIGIT+ 
 	;
 
-fragment BINARY_LITERAL
+DECIMAL_LITERAL
+	: DIGIT+
+	;
+
+BINARY_LITERAL
 	: BINARY_PREFIX ('0' | '1')+
+	;
+
+HEX_LITERAL
+	: HEX_PREFIX HEX_DIGIT+
 	;
 
 REAL_LITERAL
