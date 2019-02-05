@@ -8,10 +8,12 @@
 #include "parser/tlangBaseVisitor.h"
 #include "TTypes.h"
 
+#include "llvm/ADT/StringRef.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
+
 
 using namespace antlr4;
 using namespace std;
@@ -57,11 +59,6 @@ public:
                 }
             }
         }
-        // auto l = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 100, true));
-        // auto r = llvm::ConstantInt::get(TheContext, llvm::APInt(32, 200, true));
-        // auto ret = visit(ctx->topLevel(0)->statementOrDeclaration()->statements()->expression());
-        // cout << &ret << endl;
-        // Builder.CreateRet(ret);
 
         return 0;
     }
@@ -199,9 +196,10 @@ public:
         return nullptr;
     }
 
-    llvm::Value* handleIntLiteral(tlangParser::Integer_literalContext *l, int base, bool is_signed) {
+    // all integer literals treated at 64 bit to start and casted down later
+    llvm::Value* handleIntLiteral(tlangParser::Integer_literalContext *l, const char* str, int base, bool is_signed) {
         char *strtolchar;
-        uint64_t i = strtoull(l->getText().c_str(), &strtolchar, base);
+        uint64_t i = strtoull(str, &strtolchar, base);
 
         if (errno == ERANGE) {
             printErr(l->getStart()->getLine(), 
@@ -219,22 +217,27 @@ public:
                 if (l->sign) {
                     // signed integer
                     if (l->sign->getType() == tlangParser::MINUS) {
-                        return handleIntLiteral(l, 10, true);
+                        return handleIntLiteral(l, l->getText().c_str(), 10, true);
                     } 
                 } else {
                     // unsigned integer
-                    return handleIntLiteral(l, 10, false);
+                    return handleIntLiteral(l, l->getText().c_str(), 10, false);
                 }
             } else if (l->HEX_LITERAL()) {
-                return handleIntLiteral(l, 16, false);
+                // shift start of string by length of prefix
+                return handleIntLiteral(l, l->HEX_LITERAL()->getText().c_str() + 2, 16, false);
             } else if (l->OCTAL_LITERAL()) {
-                return handleIntLiteral(l, 8, false);
+                return handleIntLiteral(l, l->OCTAL_LITERAL()->getText().c_str() + 1, 8, false);
             } else if (l->BINARY_LITERAL()) {
-                return handleIntLiteral(l, 2, false);
+                return handleIntLiteral(l, l->BINARY_LITERAL()->getText().c_str() + 2, 2, false);
             }
         } else if (ctx->REAL_LITERAL()) {
             double r = atof(ctx->getText().c_str());
             return llvm::ConstantFP::get(TheContext, llvm::APFloat(r));;
+        } else if (ctx->STRING_LITERAL()) {
+            cout << "String literal!!!" << endl;
+            auto str = ctx->STRING_LITERAL()->getText();
+            return Builder.CreateGlobalString(llvm::StringRef(str), "someStr");
         }
         return nullptr;
     }

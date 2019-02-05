@@ -281,8 +281,6 @@ literal
 	| integer_literal
 	;
 
-// integer_literal
-
 STRING_LITERAL
     :   '"' STRING_CHAR_SEQUENCE? '"'
     ;
@@ -302,12 +300,12 @@ DECIMAL_LITERAL
 	: DIGIT+
 	;
 
-BINARY_LITERAL
-	: BINARY_PREFIX ('0' | '1')+
-	;
-
 HEX_LITERAL
 	: HEX_PREFIX HEX_DIGIT+
+	;
+
+BINARY_LITERAL
+	: BINARY_PREFIX ('0' | '1')+
 	;
 
 REAL_LITERAL

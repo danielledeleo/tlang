@@ -1,6 +1,6 @@
-var b : int := 4000000
-var a : int := 3
+var a : int := 9999
+
+var s : string := "hello turing"
 
 
-0b100
-
+30 + 0x33
