@@ -164,8 +164,9 @@ public:
             auto v = handleBinOp(ctx->bop, ctx->expression(0), ctx->expression(1));
             return v;
         } else if (ctx->primaryExpression()) {
-            // wait, we might not be done
-            if (ctx->primaryExpression()->literal()) {
+            if (ctx->primaryExpression()->IDENTIFIER()) {
+                return handleIdentifier(ctx->primaryExpression()->IDENTIFIER());
+            } else if (ctx->primaryExpression()->literal()) {
                 return handleLiteral(ctx->primaryExpression()->literal());
             } else if (ctx->primaryExpression()->L_PAREN()) {
                 return handleExpression(ctx->primaryExpression()->expression());
@@ -180,6 +181,12 @@ public:
         return NULL;
     }
 
+    llvm::Value *handleIdentifier(antlr4::tree::TerminalNode *ident) {
+        cout << ident->getText() << " referenced" << endl;
+        
+        return nullptr;
+    }
+
     llvm::Value *handleBinOp(Token *bop, tlangParser::ExpressionContext *LHS, tlangParser::ExpressionContext *RHS) {        
         auto op = bop->getType();
         auto lhs_v = handleExpression(LHS);
@@ -187,9 +194,11 @@ public:
 
         switch (op) {
             case tlangParser::PLUS:
-                return Builder.CreateAdd(lhs_v, rhs_v, "add"); break;
+                return Builder.CreateAdd(lhs_v, rhs_v, "Add"); break;
             case tlangParser::MINUS:
-                return Builder.CreateSub(lhs_v, rhs_v, "minus"); break;
+                return Builder.CreateSub(lhs_v, rhs_v, "Sub"); break;
+            case tlangParser::EQUAL:
+                return Builder.CreateICmpEQ(lhs_v, rhs_v, "ICmpEQ"); break;
             default:
                 break;
         }
@@ -235,7 +244,6 @@ public:
             double r = atof(ctx->getText().c_str());
             return llvm::ConstantFP::get(TheContext, llvm::APFloat(r));;
         } else if (ctx->STRING_LITERAL()) {
-            cout << "String literal!!!" << endl;
             auto str = ctx->STRING_LITERAL()->getText();
             return Builder.CreateGlobalString(llvm::StringRef(str), "someStr");
         }
@@ -297,10 +305,7 @@ int main(int argc, const char* argv[]) {
 
         if (x.second->getType()) {
             cout << x.second->getType()->typeName();
-            // if (x.second->value) {
-            if (x.second->value) 
-                cout << " | " <<x.second->value->getValueID();
-            // }
+            
             // if (x.second->getType()->group() == "primitive") {
             //     cout << "<" << ((tlang::PrimitiveType*)x.second->getType())->sizeOf() * 8 << ">";
             // }
